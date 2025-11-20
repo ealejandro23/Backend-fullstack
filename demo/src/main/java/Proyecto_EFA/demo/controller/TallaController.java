@@ -17,7 +17,7 @@ import Proyecto_EFA.demo.model.Tallas;
 import Proyecto_EFA.demo.service.TallasService;
 
 @RestController
-@RequestMapping("/api/tallas")
+@RequestMapping("/api/v1/tallas")
 public class TallaController {
 
     @Autowired

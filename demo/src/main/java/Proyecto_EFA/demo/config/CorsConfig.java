@@ -14,7 +14,7 @@ public class CorsConfig implements WebMvcConfigurer {
                     "http://localhost:3000",
                     "http://localhost:5173",
                     "http://127.0.0.1:5500",
-                    "https://frontend-efa.onrender.com"
+                    "https://frontend-fullstack.onrender.com"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
                 .allowedHeaders("*")

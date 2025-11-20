@@ -19,7 +19,7 @@ import Proyecto_EFA.demo.model.Producto;
 import Proyecto_EFA.demo.service.ProductoService;
 
 @RestController
-@RequestMapping("/api/productos")
+@RequestMapping("/api/v1/productos")
 public class ProductoController {
 
     @Autowired

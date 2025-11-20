@@ -20,7 +20,7 @@ import Proyecto_EFA.demo.model.Usuario;
 import Proyecto_EFA.demo.service.UsuarioService;
 
 @RestController
-@RequestMapping("/api/usuarios")
+@RequestMapping("/api/v1/usuarios")
 public class UsuarioController {
 
     @Autowired

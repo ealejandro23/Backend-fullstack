@@ -17,7 +17,7 @@ import Proyecto_EFA.demo.model.Materiales;
 import Proyecto_EFA.demo.service.MaterialesService;
 
 @RestController
-@RequestMapping("/api/materiales")
+@RequestMapping("/api/v1/materiales")
 public class MaterialController {
 
     @Autowired

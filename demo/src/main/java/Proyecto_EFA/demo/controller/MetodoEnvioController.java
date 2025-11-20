@@ -17,7 +17,7 @@ import Proyecto_EFA.demo.model.MetodoEnvio;
 import Proyecto_EFA.demo.service.MetodoEnvioService;
 
 @RestController
-@RequestMapping("/api/metodos-envio")
+@RequestMapping("/api/v1/metodos-envio")
 public class MetodoEnvioController {
 
     @Autowired

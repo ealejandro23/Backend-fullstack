@@ -17,7 +17,7 @@ import Proyecto_EFA.demo.model.MetodoPago;
 import Proyecto_EFA.demo.service.MetodoPagoService;
 
 @RestController
-@RequestMapping("/api/metodos-pago")
+@RequestMapping("/api/v1/metodos-pago")
 public class MetodoPagoController {
 
     @Autowired

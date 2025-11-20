@@ -16,7 +16,7 @@ import Proyecto_EFA.demo.model.Categorias;
 import Proyecto_EFA.demo.service.CategoriasService;
 
 @RestController
-@RequestMapping("/api/categorias")
+@RequestMapping("/api/v1/categorias")
 public class CategoriaController {
 
     @Autowired

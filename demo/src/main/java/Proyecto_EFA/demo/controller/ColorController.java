@@ -16,7 +16,7 @@ import Proyecto_EFA.demo.model.Colores;
 import Proyecto_EFA.demo.service.ColoresService;
 
 @RestController
-@RequestMapping("/api/colores")
+@RequestMapping("/api/v1/colores")
 public class ColorController {
 
     @Autowired

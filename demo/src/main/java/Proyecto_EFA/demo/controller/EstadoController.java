@@ -17,7 +17,7 @@ import Proyecto_EFA.demo.model.Estado;
 import Proyecto_EFA.demo.service.EstadoService;
 
 @RestController
-@RequestMapping("/api/estados")
+@RequestMapping("/api/v1/estados")
 public class EstadoController {
 
     @Autowired

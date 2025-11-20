@@ -17,7 +17,7 @@ import Proyecto_EFA.demo.model.Marca;
 import Proyecto_EFA.demo.service.MarcaService;
 
 @RestController
-@RequestMapping("/api/marcas")
+@RequestMapping("/api/v1/marcas")
 public class MarcaController {
 
     @Autowired

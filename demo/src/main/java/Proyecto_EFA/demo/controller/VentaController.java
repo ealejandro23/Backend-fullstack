@@ -18,7 +18,7 @@ import Proyecto_EFA.demo.model.Venta;
 import Proyecto_EFA.demo.service.VentaService;
 
 @RestController
-@RequestMapping("/api/ventas")
+@RequestMapping("/api/v1/ventas")
 public class VentaController {
 
     @Autowired

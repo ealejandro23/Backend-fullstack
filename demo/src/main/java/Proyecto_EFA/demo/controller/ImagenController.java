@@ -17,7 +17,7 @@ import Proyecto_EFA.demo.model.Imagen;
 import Proyecto_EFA.demo.service.ImagenService;
 
 @RestController
-@RequestMapping("/api/imagenes")
+@RequestMapping("/api/v1/imagenes")
 public class ImagenController {
 
     @Autowired
