@@ -39,27 +39,29 @@ public class Producto {
     
     private String codigo;
 
-
     @Column(name = "imagen_url", length = 255)
     private String imagenUrl;
 
+    // MANTENER EN PLURAL
     @ManyToOne
     @JoinColumn(name = "tallas_id")
-    private Tallas talla;
+    private Tallas tallas;
 
     @ManyToOne
     @JoinColumn(name = "colores_id")
-    private Colores color;
+    private Colores colores;
+
     @ManyToOne
     @JoinColumn(name = "marca_id")
     private Marca marca;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
-    private Categorias categoria;
+    private Categorias categorias;
+
     @ManyToOne
     @JoinColumn(name = "materiales_id")
-    private Materiales material;
+    private Materiales materiales;
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Imagen> imagenes = new ArrayList<>();
@@ -130,20 +132,20 @@ public class Producto {
         this.imagenUrl = imagenUrl;
     }
 
-    public Tallas getTalla() {
-        return talla;
+    public Tallas getTallas() {
+        return tallas;
     }
 
-    public void setTalla(Tallas talla) {
-        this.talla = talla;
+    public void setTallas(Tallas tallas) {
+        this.tallas = tallas;
     }
 
-    public Colores getColor() {
-        return color;
+    public Colores getColores() {
+        return colores;
     }
 
-    public void setColor(Colores color) {
-        this.color = color;
+    public void setColores(Colores colores) {
+        this.colores = colores;
     }
 
     public Marca getMarca() {
@@ -154,20 +156,20 @@ public class Producto {
         this.marca = marca;
     }
 
-    public Categorias getCategoria() {
-        return categoria;
+    public Categorias getCategorias() {
+        return categorias;
     }
 
-    public void setCategoria(Categorias categoria) {
-        this.categoria = categoria;
+    public void setCategorias(Categorias categorias) {
+        this.categorias = categorias;
     }
 
-    public Materiales getMaterial() {
-        return material;
+    public Materiales getMateriales() {
+        return materiales;
     }
 
-    public void setMaterial(Materiales material) {
-        this.material = material;
+    public void setMateriales(Materiales materiales) {
+        this.materiales = materiales;
     }
 
     public List<Imagen> getImagenes() {

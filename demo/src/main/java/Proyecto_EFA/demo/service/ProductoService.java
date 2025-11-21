@@ -49,20 +49,26 @@ public class ProductoService {
             if (productoDetails.getMarca() != null) {
                 producto.setMarca(productoDetails.getMarca());
             }
-            if (productoDetails.getCategorias() != null) { // categorias (plural)
+            if (productoDetails.getCategorias() != null) {
                 producto.setCategorias(productoDetails.getCategorias());
             }
-            if (productoDetails.getColores() != null) { // colores (plural)
+            if (productoDetails.getColores() != null) {
                 producto.setColores(productoDetails.getColores());
             }
-            if (productoDetails.getMateriales() != null) { // materiales (plural)
+            if (productoDetails.getMateriales() != null) {
                 producto.setMateriales(productoDetails.getMateriales());
             }
-            if (productoDetails.getTallas() != null) { // tallas (plural)
+            if (productoDetails.getTallas() != null) {
                 producto.setTallas(productoDetails.getTallas());
             }
             if (productoDetails.getImagenes() != null){
                 producto.setImagenes(productoDetails.getImagenes());
+            }
+            if (productoDetails.getImagenUrl() != null) {
+                producto.setImagenUrl(productoDetails.getImagenUrl());
+            }
+            if (productoDetails.getCodigo() != null) {
+                producto.setCodigo(productoDetails.getCodigo());
             }
             return productoRepository.save(producto);
         }
@@ -73,7 +79,7 @@ public class ProductoService {
         productoRepository.deleteById(id);
     }
     
-    // Métodos de búsqueda - CORREGIDOS con nombres plurales
+    // Métodos de búsqueda
     public List<Producto> getProductosByMarca(Integer marcaId) {
         return productoRepository.findByMarcaId(marcaId);
     }
