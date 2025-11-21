@@ -35,30 +35,146 @@ public class Producto {
 
     private Double precio;
     
-    private Integer stock; // FALTABA ESTE CAMPO!
+    private Integer stock;
     
-    private String codigo; // FALTABA ESTE CAMPO!
+    private String codigo;
+
+
+    @Column(name = "imagen_url", length = 255)
+    private String imagenUrl;
 
     @ManyToOne
     @JoinColumn(name = "tallas_id")
-    private Tallas tallas; // PLURAL
+    private Tallas talla;
 
     @ManyToOne
     @JoinColumn(name = "colores_id")
-    private Colores colores; // PLURAL
-
+    private Colores color;
     @ManyToOne
     @JoinColumn(name = "marca_id")
-    private Marca marca; // SINGULAR - CORRECTO
+    private Marca marca;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
-    private Categorias categorias; // PLURAL
-
+    private Categorias categoria;
     @ManyToOne
     @JoinColumn(name = "materiales_id")
-    private Materiales materiales; // PLURAL
+    private Materiales material;
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Imagen> imagenes = new ArrayList<>();
+
+    public void agregarImagen(Imagen imagen) {
+        imagenes.add(imagen);
+        imagen.setProducto(this);
+    }
+
+    public void eliminarImagen(Imagen imagen) {
+        imagenes.remove(imagen);
+        imagen.setProducto(null);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Double getPrecio() {
+        return precio;
+    }
+
+    public void setPrecio(Double precio) {
+        this.precio = precio;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public String getCodigo() {
+        return codigo;
+    }
+
+    public void setCodigo(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
+    }
+
+    public Tallas getTalla() {
+        return talla;
+    }
+
+    public void setTalla(Tallas talla) {
+        this.talla = talla;
+    }
+
+    public Colores getColor() {
+        return color;
+    }
+
+    public void setColor(Colores color) {
+        this.color = color;
+    }
+
+    public Marca getMarca() {
+        return marca;
+    }
+
+    public void setMarca(Marca marca) {
+        this.marca = marca;
+    }
+
+    public Categorias getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categorias categoria) {
+        this.categoria = categoria;
+    }
+
+    public Materiales getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Materiales material) {
+        this.material = material;
+    }
+
+    public List<Imagen> getImagenes() {
+        return imagenes;
+    }
+
+    public void setImagenes(List<Imagen> imagenes) {
+        this.imagenes = imagenes;
+    }
 }
