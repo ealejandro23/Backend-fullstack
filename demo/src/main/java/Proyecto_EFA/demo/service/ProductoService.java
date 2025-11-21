@@ -16,7 +16,6 @@ public class ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    // CRUD básico
     public List<Producto> getAllProductos() {
         return productoRepository.findAll();
     }
@@ -79,7 +78,6 @@ public class ProductoService {
         productoRepository.deleteById(id);
     }
     
-    // Métodos de búsqueda
     public List<Producto> getProductosByMarca(Integer marcaId) {
         return productoRepository.findByMarcaId(marcaId);
     }
@@ -111,8 +109,7 @@ public class ProductoService {
     public List<Producto> getProductosByMarcaAndCategoria(Integer marcaId, Integer categoriaId) {
         return productoRepository.findByMarcaIdAndCategoriaId(marcaId, categoriaId);
     }
-    
-    // Métodos para productos más caros/baratos
+
     public List<Producto> getTop10MostExpensiveProducts() {
         return productoRepository.findTop10ByOrderByPrecioDesc();
     }
@@ -120,8 +117,7 @@ public class ProductoService {
     public List<Producto> getTop10CheapestProducts() {
         return productoRepository.findTop10ByOrderByPrecioAsc();
     }
-    
-    // Métodos adicionales
+ 
     public List<Producto> searchByNombreContaining(String nombre) {
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
     }
