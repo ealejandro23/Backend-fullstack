@@ -27,18 +27,6 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "precio_original")
-    private Double precioOriginal;
-
-    @Column(name = "oferta")
-    private Boolean oferta;
-
-    @Column(name = "tipo", length = 50)
-    private String tipo;
-
-    @Column(name = "imagen_url", length = 255)
-    private String imagenUrl;
-
     @Column(length = 120, nullable = false)
     private String nombre;
 
@@ -47,27 +35,29 @@ public class Producto {
 
     private Double precio;
     
-    private Integer stock;
+    private Integer stock; // FALTABA ESTE CAMPO!
     
-    private String codigo;
+    private String codigo; // FALTABA ESTE CAMPO!
 
     @ManyToOne
     @JoinColumn(name = "tallas_id")
-    private Tallas tallas;
+    private Tallas tallas; // PLURAL
 
     @ManyToOne
     @JoinColumn(name = "colores_id")
-    private Colores colores;
+    private Colores colores; // PLURAL
+
     @ManyToOne
     @JoinColumn(name = "marca_id")
-    private Marca marca;
+    private Marca marca; // SINGULAR - CORRECTO
+
     @ManyToOne
     @JoinColumn(name = "categoria_id")
-    private Categorias categorias;
+    private Categorias categorias; // PLURAL
 
     @ManyToOne
     @JoinColumn(name = "materiales_id")
-    private Materiales materiales;
+    private Materiales materiales; // PLURAL
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Imagen> imagenes = new ArrayList<>();

@@ -6,6 +6,4 @@ import Proyecto_EFA.demo.model.Materiales;
 
 public interface MaterialesRepository extends JpaRepository<Materiales, Integer> {
     
-    Optional<Materiales> findByNombre(String nombre);
-    List<Materiales> findAllOrderedByName();
 }

@@ -5,6 +5,5 @@ import Proyecto_EFA.demo.model.Tallas;
 
 public interface TallasRepository extends JpaRepository<Tallas, Integer> {
 
-    Optional<Tallas> findByNombre(String nombre);
     
 }
