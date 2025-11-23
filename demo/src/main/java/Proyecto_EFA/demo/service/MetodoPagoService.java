@@ -22,6 +22,7 @@ public class MetodoPagoService {
         return metodoPagoRepository.findById(id).orElse(null);
     }
 
+<<<<<<< HEAD
     public MetodoPago getMetodoPagoByNombre(String nombre) {
         return metodoPagoRepository.findByNombre(nombre);
     }
@@ -32,12 +33,16 @@ public class MetodoPagoService {
             throw new RuntimeException("Ya existe un método de pago con el nombre: " + metodoPago.getNombre());
         }
         
+=======
+    public MetodoPago createMetodoPago(MetodoPago metodoPago) {
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
         return metodoPagoRepository.save(metodoPago);
     }
 
     public MetodoPago updateMetodoPago(Integer id, MetodoPago metodoPagoDetails) {
         MetodoPago metodoPago = metodoPagoRepository.findById(id).orElse(null);
         if (metodoPago != null) {
+<<<<<<< HEAD
             // Validar nombre único si se está cambiando
             if (metodoPagoDetails.getNombre() != null && 
                 !metodoPagoDetails.getNombre().equals(metodoPago.getNombre())) {
@@ -72,12 +77,21 @@ public class MetodoPagoService {
                 metodoPago.setDescripcion(metodoPagoDetails.getDescripcion());
             }
             
+=======
+            if (metodoPagoDetails.getNombre() != null) {
+                metodoPago.setNombre(metodoPagoDetails.getNombre());
+            }
+            if (metodoPagoDetails.getDescripcion() != null) {
+                metodoPago.setDescripcion(metodoPagoDetails.getDescripcion());
+            }
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
             return metodoPagoRepository.save(metodoPago);
         }
         return null;
     }
 
     public void deleteMetodoPago(Integer id) {
+<<<<<<< HEAD
         MetodoPago metodoPago = metodoPagoRepository.findById(id).orElse(null);
         if (metodoPago != null) {
             // Verificar si hay ventas asociadas antes de eliminar
@@ -93,3 +107,8 @@ public class MetodoPagoService {
     }
 
 }
+=======
+        metodoPagoRepository.deleteById(id);
+    }
+}
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9

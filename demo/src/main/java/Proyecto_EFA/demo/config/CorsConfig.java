@@ -9,6 +9,7 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+<<<<<<< HEAD
         // Aceptar todas las rutas bajo /api/ para evitar bloqueos por rutas específicas
         registry.addMapping("/api/**")
                 .allowedOrigins(
@@ -28,3 +29,17 @@ public class CorsConfig implements WebMvcConfigurer {
                 .maxAge(3600); // 1 hora de cache para preflight
     }
 }
+=======
+        registry.addMapping("/v1/**")
+                .allowedOrigins(
+                    "http://localhost:3000",
+                    "http://localhost:5173",
+                    "http://127.0.0.1:5500",
+                    "https://frontend-fullstack.onrender.com"
+                )
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+    }
+}
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9

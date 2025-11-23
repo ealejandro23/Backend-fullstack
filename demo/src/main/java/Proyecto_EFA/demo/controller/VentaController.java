@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+<<<<<<< HEAD
 import Proyecto_EFA.demo.dto.VentaRequest;
 import Proyecto_EFA.demo.dto.ItemVentaRequest;
 import Proyecto_EFA.demo.model.Venta;
@@ -29,6 +30,10 @@ import Proyecto_EFA.demo.service.EstadoService;
 import Proyecto_EFA.demo.service.MetodoPagoService;
 import Proyecto_EFA.demo.service.MetodoEnvioService;
 import Proyecto_EFA.demo.service.ProductoService;
+=======
+import Proyecto_EFA.demo.model.Venta;
+import Proyecto_EFA.demo.service.VentaService;
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
 
 @RestController
 @RequestMapping("/api/v1/ventas")
@@ -37,6 +42,7 @@ public class VentaController {
     @Autowired
     private VentaService ventaService;
 
+<<<<<<< HEAD
     @Autowired
     private UsuarioService usuarioService;
 
@@ -134,6 +140,8 @@ public class VentaController {
         return ResponseEntity.status(201).body(createdVenta);
     }
 
+=======
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
     @GetMapping
     public ResponseEntity<List<Venta>> getAllVentas() {
         return ResponseEntity.ok(ventaService.getAllVentas());
@@ -145,6 +153,15 @@ public class VentaController {
         return venta != null ? ResponseEntity.ok(venta) : ResponseEntity.notFound().build();
     }
 
+<<<<<<< HEAD
+=======
+    @PostMapping
+    public ResponseEntity<Venta> createVenta(@RequestBody Venta venta) {
+        Venta createdVenta = ventaService.createVenta(venta);
+        return ResponseEntity.status(201).body(createdVenta);
+    }
+
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
     @PutMapping("/{id}")
     public ResponseEntity<Venta> updateVenta(@PathVariable Long id, @RequestBody Venta ventaDetails) {
         Venta updated = ventaService.updateVenta(id, ventaDetails);

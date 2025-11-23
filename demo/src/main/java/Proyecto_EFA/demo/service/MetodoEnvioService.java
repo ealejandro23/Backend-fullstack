@@ -22,6 +22,7 @@ public class MetodoEnvioService {
         return metodoEnvioRepository.findById(id).orElse(null);
     }
 
+<<<<<<< HEAD
     public MetodoEnvio getMetodoEnvioByNombre(String nombre) {
         return metodoEnvioRepository.findByNombre(nombre);
     }
@@ -37,12 +38,16 @@ public class MetodoEnvioService {
             throw new RuntimeException("Ya existe un método de envío con el nombre: " + metodoEnvio.getNombre());
         }
         
+=======
+    public MetodoEnvio createMetodoEnvio(MetodoEnvio metodoEnvio) {
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
         return metodoEnvioRepository.save(metodoEnvio);
     }
 
     public MetodoEnvio updateMetodoEnvio(Integer id, MetodoEnvio metodoEnvioDetails) {
         MetodoEnvio metodoEnvio = metodoEnvioRepository.findById(id).orElse(null);
         if (metodoEnvio != null) {
+<<<<<<< HEAD
             // Validar nombre único si se está cambiando
             if (metodoEnvioDetails.getNombre() != null && 
                 !metodoEnvioDetails.getNombre().equals(metodoEnvio.getNombre())) {
@@ -91,12 +96,21 @@ public class MetodoEnvioService {
                 metodoEnvio.setPrecio(metodoEnvioDetails.getPrecio());
             }
             
+=======
+            if (metodoEnvioDetails.getNombre() != null) {
+                metodoEnvio.setNombre(metodoEnvioDetails.getNombre());
+            }
+            if (metodoEnvioDetails.getPrecio() != null) {
+                metodoEnvio.setPrecio(metodoEnvioDetails.getPrecio());
+            }
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
             return metodoEnvioRepository.save(metodoEnvio);
         }
         return null;
     }
 
     public void deleteMetodoEnvio(Integer id) {
+<<<<<<< HEAD
         MetodoEnvio metodoEnvio = metodoEnvioRepository.findById(id).orElse(null);
         if (metodoEnvio != null) {
             // Verificar si hay ventas asociadas antes de eliminar
@@ -112,3 +126,8 @@ public class MetodoEnvioService {
     }
 
 }
+=======
+        metodoEnvioRepository.deleteById(id);
+    }
+}
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9

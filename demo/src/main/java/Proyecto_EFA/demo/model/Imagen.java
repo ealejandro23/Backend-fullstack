@@ -1,7 +1,10 @@
 package Proyecto_EFA.demo.model;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+=======
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,6 +31,12 @@ public class Imagen {
 
 	@ManyToOne
 	@JoinColumn(name = "producto_id")
+<<<<<<< HEAD
 	@JsonIgnore
 	private Producto producto;
 }
+=======
+	private Producto producto;
+
+}
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9

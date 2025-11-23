@@ -3,9 +3,12 @@ package Proyecto_EFA.demo.model;
 import java.util.ArrayList;
 import java.util.List;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+=======
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,31 +51,49 @@ public class Producto {
     // MANTENER EN PLURAL
     @ManyToOne
     @JoinColumn(name = "tallas_id")
+<<<<<<< HEAD
     @JsonIgnoreProperties({"productos", "hibernateLazyInitializer", "handler"})
+=======
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
     private Tallas tallas;
 
     @ManyToOne
     @JoinColumn(name = "colores_id")
+<<<<<<< HEAD
     @JsonIgnoreProperties({"productos", "hibernateLazyInitializer", "handler"})
+=======
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
     private Colores colores;
 
     @ManyToOne
     @JoinColumn(name = "marca_id")
+<<<<<<< HEAD
     @JsonIgnoreProperties({"productos", "hibernateLazyInitializer", "handler"})
+=======
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
     private Marca marca;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
+<<<<<<< HEAD
     @JsonIgnoreProperties({"productos", "hibernateLazyInitializer", "handler"})
+=======
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
     private Categorias categorias;
 
     @ManyToOne
     @JoinColumn(name = "materiales_id")
+<<<<<<< HEAD
     @JsonIgnoreProperties({"productos", "hibernateLazyInitializer", "handler"})
     private Materiales materiales;
 
     @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnore
+=======
+    private Materiales materiales;
+
+    @OneToMany(mappedBy = "producto", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
     private List<Imagen> imagenes = new ArrayList<>();
 
     public void agregarImagen(Imagen imagen) {

@@ -129,5 +129,8 @@ public class ProductoService {
     public Optional<Producto> getProductoByCodigo(String codigo) {
         return productoRepository.findByCodigo(codigo);
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
 }
