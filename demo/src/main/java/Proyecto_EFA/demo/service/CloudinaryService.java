@@ -14,7 +14,6 @@ public class CloudinaryService {
     @Autowired
     private Cloudinary cloudinary;
     public Map<?, ?> uploadImage(MultipartFile file) throws IOException {
-        // La carpeta 'efa_productos' se usa para organizar las imágenes en Cloudinary.
         Map<?, ?> uploadResult = cloudinary.uploader().upload(
             file.getBytes(), 
             ObjectUtils.asMap("folder", "efa_productos") 
