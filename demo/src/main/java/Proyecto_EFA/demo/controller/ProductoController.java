@@ -4,29 +4,28 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import Proyecto_EFA.demo.model.Producto;
 import Proyecto_EFA.demo.service.ProductoService;
 
 @RestController
-@RequestMapping({"/api/v1/productos", "/api/productos", "/productos"})
+@RequestMapping("/api/v1/productos")
 public class ProductoController {
 
     @Autowired
     private ProductoService productoService;
 
-    @GetMapping
-    public ResponseEntity<List<Producto>> getAllProductos() {
+    @GetMapping 
+    public ResponseEntity<List<Producto>> getProductosFiltrados(
+        @RequestParam(required = false) String categoria,
+        @RequestParam(required = false) String genero
+    ) {
+        if (categoria != null || genero != null) {
+            List<Producto> productosFiltrados = productoService.findProductosByFilters(categoria, genero);
+            return ResponseEntity.ok(productosFiltrados);
+        }
+        
         return ResponseEntity.ok(productoService.getAllProductos());
     }
 
@@ -124,7 +123,7 @@ public class ProductoController {
     
     @GetMapping("/top/mas-caros/{limit}")
     public ResponseEntity<List<Producto>> getTopMostExpensiveProducts(@PathVariable int limit) {
-        List<Producto> productos = productoService.getTopMostExpensiveProducts(limit);
+        List<Producto> productos = productoService.getTop10MostExpensiveProducts(); 
         return ResponseEntity.ok(productos);
     }
     
@@ -140,37 +139,4 @@ public class ProductoController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-    @GetMapping("/buscar/categoria-nombre/{categoriaNombre}")
-    public ResponseEntity<List<Producto>> getProductosByCategoriaNombre(@PathVariable String categoriaNombre) {
-        List<Producto> productos = productoService.getProductosByCategoriaNombre(categoriaNombre);
-        return ResponseEntity.ok(productos);
-    }
-
-    @GetMapping("/buscar/subcategoria/{subcategoria}")
-    public ResponseEntity<List<Producto>> getProductosBySubcategoria(@PathVariable String subcategoria) {
-        List<Producto> productos = productoService.getProductosBySubcategoria(subcategoria);
-        return ResponseEntity.ok(productos);
-    }
-
-    @GetMapping("/buscar/categoria-nombre/{categoriaNombre}/subcategoria/{subcategoria}")
-    public ResponseEntity<List<Producto>> getProductosByCategoriaAndSubcategoria(
-            @PathVariable String categoriaNombre, 
-            @PathVariable String subcategoria) {
-        List<Producto> productos = productoService.getProductosByCategoriaAndSubcategoria(categoriaNombre, subcategoria);
-        return ResponseEntity.ok(productos);
-    }
-
-    // Endpoint flexible con query parameters
-    @GetMapping("/buscar/filtros")
-    public ResponseEntity<List<Producto>> getProductosByFiltros(
-            @RequestParam(required = false) String categoria,
-            @RequestParam(required = false) String subcategoria,
-            @RequestParam(required = false) String genero) {
-        
-        List<Producto> productos = productoService.getProductosByFiltros(categoria, subcategoria, genero);
-        return ResponseEntity.ok(productos);
-    }
-
-    
 }

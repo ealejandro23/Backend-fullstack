@@ -2,16 +2,15 @@ package Proyecto_EFA.demo.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Collections;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
+
 import Proyecto_EFA.demo.model.Producto;
+import Proyecto_EFA.demo.model.Categorias;
 import Proyecto_EFA.demo.repository.ProductoRepository;
+import Proyecto_EFA.demo.repository.CategoriasRepository; 
 
 @Service
 @Transactional
@@ -19,11 +18,58 @@ public class ProductoService {
 
     @Autowired
     private ProductoRepository productoRepository;
+    
+    @Autowired 
+    private CategoriasRepository categoriasRepository; // Necesario para buscar por nombre
 
     public List<Producto> getAllProductos() {
         return productoRepository.findAll();
     }
 
+    // ✅ MÉTODO DE FILTRADO CORRECTO
+    public List<Producto> findProductosByFilters(String categoriaNombre, String generoNombre) {
+        
+        if (categoriaNombre != null && !categoriaNombre.isEmpty()) {
+            
+            // ⭐ Lógica para 'todo' ⭐
+            if (categoriaNombre.equalsIgnoreCase("todo") && generoNombre != null) {
+                // Si piden 'todo', buscamos por el género principal (hombre/mujer/infantil)
+                Optional<Categorias> generoOpt = categoriasRepository.findByNombre(generoNombre);
+                
+                if (generoOpt.isPresent()) {
+                    return productoRepository.findByCategoriaId(generoOpt.get().getId());
+                } else {
+                    return List.of();
+                }
+            } 
+            // ⭐ Lógica para Categoría Específica (poleras, pantalones) ⭐
+            else {
+                Optional<Categorias> categoriaOpt = categoriasRepository.findByNombre(categoriaNombre);
+                
+                if (categoriaOpt.isPresent()) {
+                    Integer categoriaId = categoriaOpt.get().getId();
+                    return productoRepository.findByCategoriaId(categoriaId); 
+                } else {
+                    return List.of(); 
+                }
+            }
+        }
+        
+        // 2. Manejar el filtro por 'genero' solo
+        if (generoNombre != null && !generoNombre.isEmpty()) {
+             Optional<Categorias> generoOpt = categoriasRepository.findByNombre(generoNombre);
+            
+            if (generoOpt.isPresent()) {
+                Integer generoId = generoOpt.get().getId();
+                return productoRepository.findByCategoriaId(generoId);
+            } else {
+                return List.of(); 
+            }
+        }
+        
+        return productoRepository.findAll();
+    }
+    
     public Producto getProductoById(Integer id) {
         return productoRepository.findById(id).orElse(null);
     }
@@ -121,14 +167,6 @@ public class ProductoService {
     public List<Producto> getTop10CheapestProducts() {
         return productoRepository.findTop10ByOrderByPrecioAsc();
     }
-
-    public List<Producto> getTopMostExpensiveProducts(int limit) {
-        if (limit <= 0) {
-            return Collections.emptyList();
-        }
-        int size = Math.min(limit, 1000); // evitar requests excesivos
-        return productoRepository.findAll(PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "precio"))).getContent();
-    }
  
     public List<Producto> searchByNombreContaining(String nombre) {
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
@@ -141,43 +179,4 @@ public class ProductoService {
     public Optional<Producto> getProductoByCodigo(String codigo) {
         return productoRepository.findByCodigo(codigo);
     }
-
-    public List<Producto> getProductosByCategoriaNombre(String categoriaNombre) {
-        return productoRepository.findByCategoriaNombre(categoriaNombre);
-    }
-
-    public List<Producto> getProductosBySubcategoria(String subcategoria) {
-        return productoRepository.findBySubcategoria(subcategoria);
-    }
-
-    public List<Producto> getProductosByCategoriaAndSubcategoria(String categoriaNombre, String subcategoria) {
-        return productoRepository.findByCategoriaNombreAndSubcategoria(categoriaNombre, subcategoria);
-    }
-
-    public List<Producto> getProductosByFiltros(String categoria, String subcategoria, String genero) {
-        // Implementación sencilla y flexible en memoria: recuperar todos y filtrar.
-        List<Producto> resultados = productoRepository.findAll();
-
-        if (categoria != null && !categoria.isBlank()) {
-            String cat = categoria.toLowerCase();
-            resultados.removeIf(p -> p.getCategorias() == null || p.getCategorias().getNombre() == null || !p.getCategorias().getNombre().toLowerCase().contains(cat));
-        }
-
-        if (subcategoria != null && !subcategoria.isBlank()) {
-            String sub = subcategoria.toLowerCase();
-            resultados.removeIf(p -> p.getCategorias() == null || (
-                    (p.getCategorias().getDescripcion() == null || !p.getCategorias().getDescripcion().toLowerCase().contains(sub))
-                    && (p.getCategorias().getNombre() == null || !p.getCategorias().getNombre().toLowerCase().contains(sub))
-            ));
-        }
-
-        if (genero != null && !genero.isBlank()) {
-            String gen = genero.toLowerCase();
-            // Como no hay campo genero en Producto, intentamos mapearlo contra categorias.nombre
-            resultados.removeIf(p -> p.getCategorias() == null || p.getCategorias().getNombre() == null || !p.getCategorias().getNombre().toLowerCase().contains(gen));
-        }
-
-        return resultados;
-    }
-
 }
