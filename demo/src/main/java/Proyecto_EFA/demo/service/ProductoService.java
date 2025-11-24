@@ -1,16 +1,22 @@
 package Proyecto_EFA.demo.service;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 import Proyecto_EFA.demo.model.Producto;
 import Proyecto_EFA.demo.model.Categorias;
 import Proyecto_EFA.demo.repository.ProductoRepository;
-import Proyecto_EFA.demo.repository.CategoriasRepository; 
+import Proyecto_EFA.demo.repository.CategoriasRepository;
 
 @Service
 @Transactional
@@ -19,21 +25,47 @@ public class ProductoService {
     @Autowired
     private ProductoRepository productoRepository;
     
-    @Autowired 
-    private CategoriasRepository categoriasRepository; // Necesario para buscar por nombre
+    @Autowired
+    private CategoriasRepository categoriasRepository; 
+    
+    @Autowired
+    private Cloudinary cloudinary; 
+
+    // ----------------------------------------------------------------------
+    // MÉTODOS DE CLOUDINARY
+    // ----------------------------------------------------------------------
+    
+    public String uploadImage(MultipartFile file) throws IOException {
+        Map<?, ?> uploadResult = cloudinary.uploader().upload(
+            file.getBytes(), 
+            ObjectUtils.asMap("folder", "efa_productos") 
+        );
+        
+        return uploadResult.get("url").toString();
+    }
+    
+    public Producto createProductoWithImage(Producto producto, MultipartFile imageFile) throws IOException {
+        
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String imageUrl = uploadImage(imageFile);
+            producto.setImagenUrl(imageUrl); 
+        }
+        
+        return productoRepository.save(producto);
+    }
+
+    // ----------------------------------------------------------------------
+    // MÉTODOS CRUD Y FILTROS EXISTENTES
+    // ----------------------------------------------------------------------
 
     public List<Producto> getAllProductos() {
         return productoRepository.findAll();
     }
 
-    // ✅ MÉTODO DE FILTRADO CORRECTO
     public List<Producto> findProductosByFilters(String categoriaNombre, String generoNombre) {
         
-        if (categoriaNombre != null && !categoriaNombre.isEmpty()) {
-            
-            // ⭐ Lógica para 'todo' ⭐
+        if (categoriaNombre != null && !categoriaNombre.isEmpty()) {            
             if (categoriaNombre.equalsIgnoreCase("todo") && generoNombre != null) {
-                // Si piden 'todo', buscamos por el género principal (hombre/mujer/infantil)
                 Optional<Categorias> generoOpt = categoriasRepository.findByNombre(generoNombre);
                 
                 if (generoOpt.isPresent()) {
@@ -41,29 +73,26 @@ public class ProductoService {
                 } else {
                     return List.of();
                 }
-            } 
-            // ⭐ Lógica para Categoría Específica (poleras, pantalones) ⭐
+            }
             else {
                 Optional<Categorias> categoriaOpt = categoriasRepository.findByNombre(categoriaNombre);
                 
                 if (categoriaOpt.isPresent()) {
                     Integer categoriaId = categoriaOpt.get().getId();
-                    return productoRepository.findByCategoriaId(categoriaId); 
+                    return productoRepository.findByCategoriaId(categoriaId);
                 } else {
-                    return List.of(); 
+                    return List.of();
                 }
             }
         }
-        
-        // 2. Manejar el filtro por 'genero' solo
         if (generoNombre != null && !generoNombre.isEmpty()) {
-             Optional<Categorias> generoOpt = categoriasRepository.findByNombre(generoNombre);
+            Optional<Categorias> generoOpt = categoriasRepository.findByNombre(generoNombre);
             
             if (generoOpt.isPresent()) {
                 Integer generoId = generoOpt.get().getId();
                 return productoRepository.findByCategoriaId(generoId);
             } else {
-                return List.of(); 
+                return List.of();
             }
         }
         
@@ -73,7 +102,6 @@ public class ProductoService {
     public Producto getProductoById(Integer id) {
         return productoRepository.findById(id).orElse(null);
     }
-
     public Producto createProducto(Producto producto) {
         return productoRepository.save(producto);
     }
@@ -167,7 +195,7 @@ public class ProductoService {
     public List<Producto> getTop10CheapestProducts() {
         return productoRepository.findTop10ByOrderByPrecioAsc();
     }
- 
+
     public List<Producto> searchByNombreContaining(String nombre) {
         return productoRepository.findByNombreContainingIgnoreCase(nombre);
     }
