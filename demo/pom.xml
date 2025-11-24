@@ -58,12 +58,12 @@
 		<dependency>
 			<groupId>com.cloudinary</groupId>
 			<artifactId>cloudinary-httpclient</artifactId>
-			<version>1.38.0</version>
+			<version>1.37.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.cloudinary</groupId>
 			<artifactId>cloudinary-core</artifactId>
-			<version>1.38.0</version>
+			<version>1.37.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
