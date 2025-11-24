@@ -1,10 +1,13 @@
 package Proyecto_EFA.demo.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import Proyecto_EFA.demo.model.Producto;
 import Proyecto_EFA.demo.service.ProductoService;
@@ -16,6 +19,21 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
+    @PostMapping("/with-image")
+    public ResponseEntity<?> createProductoWithImage(
+        @RequestPart("producto") Producto producto, 
+        @RequestPart("file") MultipartFile file      
+    ) {
+        try {
+            // Llamamos al servicio que maneja la subida a Cloudinary y el guardado en DB
+            Producto createdProducto = productoService.createProductoWithImage(producto, file);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdProducto);
+        } catch (IOException e) {
+            // Manejo de errores en caso de fallo en Cloudinary o I/O
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Error al subir la imagen a Cloudinary o al crear el producto: " + e.getMessage());
+        }
+    }
     @GetMapping 
     public ResponseEntity<List<Producto>> getProductosFiltrados(
         @RequestParam(required = false) String categoria,
@@ -123,6 +141,7 @@ public class ProductoController {
     
     @GetMapping("/top/mas-caros/{limit}")
     public ResponseEntity<List<Producto>> getTopMostExpensiveProducts(@PathVariable int limit) {
+
         List<Producto> productos = productoService.getTop10MostExpensiveProducts(); 
         return ResponseEntity.ok(productos);
     }
