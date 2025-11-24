@@ -10,7 +10,8 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         // Configuración para TODAS las rutas
-        registry.addMapping("/**")
+            // Permitir CORS para rutas de API y para /productos (soporta frontend que use distintas bases)
+            registry.addMapping("/**")
                 .allowedOrigins(
                     "https://frontend-fullstack.onrender.com",
                     "http://localhost:3000",

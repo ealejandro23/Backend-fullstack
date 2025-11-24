@@ -19,7 +19,7 @@ import Proyecto_EFA.demo.model.Producto;
 import Proyecto_EFA.demo.service.ProductoService;
 
 @RestController
-@RequestMapping("/api/v1/productos")
+@RequestMapping({"/api/v1/productos", "/api/productos", "/productos"})
 public class ProductoController {
 
     @Autowired
@@ -124,7 +124,7 @@ public class ProductoController {
     
     @GetMapping("/top/mas-caros/{limit}")
     public ResponseEntity<List<Producto>> getTopMostExpensiveProducts(@PathVariable int limit) {
-        List<Producto> productos = productoService.getTop10MostExpensiveProducts(); 
+        List<Producto> productos = productoService.getTopMostExpensiveProducts(limit);
         return ResponseEntity.ok(productos);
     }
     

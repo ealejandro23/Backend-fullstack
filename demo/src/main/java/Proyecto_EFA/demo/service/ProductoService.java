@@ -2,6 +2,10 @@ package Proyecto_EFA.demo.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Collections;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -116,6 +120,14 @@ public class ProductoService {
     
     public List<Producto> getTop10CheapestProducts() {
         return productoRepository.findTop10ByOrderByPrecioAsc();
+    }
+
+    public List<Producto> getTopMostExpensiveProducts(int limit) {
+        if (limit <= 0) {
+            return Collections.emptyList();
+        }
+        int size = Math.min(limit, 1000); // evitar requests excesivos
+        return productoRepository.findAll(PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "precio"))).getContent();
     }
  
     public List<Producto> searchByNombreContaining(String nombre) {

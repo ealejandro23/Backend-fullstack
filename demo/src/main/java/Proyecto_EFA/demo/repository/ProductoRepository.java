@@ -14,6 +14,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
     @Query("SELECT p FROM Producto p WHERE p.marca.id = :marcaId")
     List<Producto> findByMarcaId(@Param("marcaId") Integer marcaId);
     
+    // ✅ MÉTODO CRÍTICO para la solución (filtra por ID, obtenido del nombre)
     @Query("SELECT p FROM Producto p WHERE p.categorias.id = :categoriaId") 
     List<Producto> findByCategoriaId(@Param("categoriaId") Integer categoriaId);
     
@@ -32,7 +33,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
     @Query("SELECT p FROM Producto p WHERE p.tallas.id = :tallaId") 
     List<Producto> findByTallaId(@Param("tallaId") Integer tallaId);
     
-    @Query("SELECT p FROM Producto p WHERE p.marca.id = :marcaId AND p.categorias.id = :categoriaId") // categorias (plural)
+    @Query("SELECT p FROM Producto p WHERE p.marca.id = :marcaId AND p.categorias.id = :categoriaId")
     List<Producto> findByMarcaIdAndCategoriaId(@Param("marcaId") Integer marcaId, @Param("categoriaId") Integer categoriaId);
     
     List<Producto> findTop10ByOrderByPrecioDesc();
@@ -43,13 +44,4 @@ public interface ProductoRepository extends JpaRepository<Producto, Integer> {
     List<Producto> findByPrecioLessThanEqual(Double precioMax);
     List<Producto> findByStockGreaterThan(Integer stock);
     Optional<Producto> findByCodigo(String codigo);
-
-    @Query("SELECT p FROM Producto p WHERE LOWER(p.categorias.nombre) = LOWER(:categoriaNombre)")
-    List<Producto> findByCategoriaNombre(@Param("categoriaNombre") String categoriaNombre);
-
-    @Query("SELECT p FROM Producto p WHERE LOWER(p.categorias.descripcion) LIKE LOWER(CONCAT('%', :subcategoria, '%')) OR LOWER(p.categorias.nombre) LIKE LOWER(CONCAT('%', :subcategoria, '%'))")
-    List<Producto> findBySubcategoria(@Param("subcategoria") String subcategoria);
-
-    @Query("SELECT p FROM Producto p WHERE LOWER(p.categorias.nombre) = LOWER(:categoriaNombre) AND (LOWER(p.categorias.descripcion) LIKE LOWER(CONCAT('%', :subcategoria, '%')) OR LOWER(p.categorias.nombre) LIKE LOWER(CONCAT('%', :subcategoria, '%'))) ")
-    List<Producto> findByCategoriaNombreAndSubcategoria(@Param("categoriaNombre") String categoriaNombre, @Param("subcategoria") String subcategoria);
 }
