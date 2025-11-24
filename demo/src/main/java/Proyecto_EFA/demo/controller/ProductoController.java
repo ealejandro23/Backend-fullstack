@@ -21,20 +21,19 @@ public class ProductoController {
 
     @PostMapping("/with-image")
     public ResponseEntity<?> createProductoWithImage(
-        @RequestPart("producto") Producto producto, 
-        @RequestPart("file") MultipartFile file      
+        @RequestPart("producto") Producto producto,
+        @RequestPart("file") MultipartFile file
     ) {
         try {
-            // Llamamos al servicio que maneja la subida a Cloudinary y el guardado en DB
             Producto createdProducto = productoService.createProductoWithImage(producto, file);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdProducto);
         } catch (IOException e) {
-            // Manejo de errores en caso de fallo en Cloudinary o I/O
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Error al subir la imagen a Cloudinary o al crear el producto: " + e.getMessage());
         }
     }
-    @GetMapping 
+
+    @GetMapping
     public ResponseEntity<List<Producto>> getProductosFiltrados(
         @RequestParam(required = false) String categoria,
         @RequestParam(required = false) String genero
@@ -43,7 +42,6 @@ public class ProductoController {
             List<Producto> productosFiltrados = productoService.findProductosByFilters(categoria, genero);
             return ResponseEntity.ok(productosFiltrados);
         }
-        
         return ResponseEntity.ok(productoService.getAllProductos());
     }
 
@@ -76,82 +74,71 @@ public class ProductoController {
         productoService.deleteProducto(id);
         return ResponseEntity.noContent().build();
     }
-    
+
     @GetMapping("/buscar/marca/{marcaId}")
     public ResponseEntity<List<Producto>> getProductosByMarca(@PathVariable Integer marcaId) {
-        List<Producto> productos = productoService.getProductosByMarca(marcaId);
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getProductosByMarca(marcaId));
     }
-    
+
     @GetMapping("/buscar/categoria/{categoriaId}")
     public ResponseEntity<List<Producto>> getProductosByCategoria(@PathVariable Integer categoriaId) {
-        List<Producto> productos = productoService.getProductosByCategoria(categoriaId);
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getProductosByCategoria(categoriaId));
     }
-    
+
     @GetMapping("/buscar/color/{colorId}")
     public ResponseEntity<List<Producto>> getProductosByColor(@PathVariable Integer colorId) {
-        List<Producto> productos = productoService.getProductosByColor(colorId);
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getProductosByColor(colorId));
     }
-    
+
     @GetMapping("/buscar/material/{materialId}")
     public ResponseEntity<List<Producto>> getProductosByMaterial(@PathVariable Integer materialId) {
-        List<Producto> productos = productoService.getProductosByMaterial(materialId);
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getProductosByMaterial(materialId));
     }
-    
+
     @GetMapping("/buscar/talla/{tallaId}")
     public ResponseEntity<List<Producto>> getProductosByTalla(@PathVariable Integer tallaId) {
-        List<Producto> productos = productoService.getProductosByTalla(tallaId);
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getProductosByTalla(tallaId));
     }
-    
+
     @GetMapping("/buscar/rango-precio")
     public ResponseEntity<List<Producto>> getProductosByPriceRange(
             @RequestParam Double precioMin,
             @RequestParam Double precioMax) {
-        List<Producto> productos = productoService.getProductosByPriceRange(precioMin, precioMax);
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getProductosByPriceRange(precioMin, precioMax));
     }
-    
+
     @GetMapping("/buscar/nombre")
     public ResponseEntity<List<Producto>> searchProductosByNombre(@RequestParam String nombre) {
-        List<Producto> productos = productoService.searchProductosByNombre(nombre);
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.searchProductosByNombre(nombre));
     }
-    
+
     @GetMapping("/buscar/marca/{marcaId}/categoria/{categoriaId}")
-    public ResponseEntity<List<Producto>> getProductosByMarcaAndCategoria(@PathVariable Integer marcaId, @PathVariable Integer categoriaId) {
-        List<Producto> productos = productoService.getProductosByMarcaAndCategoria(marcaId, categoriaId);
-        return ResponseEntity.ok(productos);
+    public ResponseEntity<List<Producto>> getProductosByMarcaAndCategoria(
+            @PathVariable Integer marcaId,
+            @PathVariable Integer categoriaId) {
+        return ResponseEntity.ok(productoService.getProductosByMarcaAndCategoria(marcaId, categoriaId));
     }
 
     @GetMapping("/top/mas-caros")
     public ResponseEntity<List<Producto>> getTop10MostExpensiveProducts() {
-        List<Producto> productos = productoService.getTop10MostExpensiveProducts();
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getTop10MostExpensiveProducts());
     }
-    
+
     @GetMapping("/top/mas-baratos")
     public ResponseEntity<List<Producto>> getTop10CheapestProducts() {
-        List<Producto> productos = productoService.getTop10CheapestProducts();
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getTop10CheapestProducts());
     }
-    
+
     @GetMapping("/top/mas-caros/{limit}")
     public ResponseEntity<List<Producto>> getTopMostExpensiveProducts(@PathVariable int limit) {
-
-        List<Producto> productos = productoService.getTop10MostExpensiveProducts(); 
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getTop10MostExpensiveProducts());
     }
-    
+
     @GetMapping("/buscar/stock")
     public ResponseEntity<List<Producto>> getProductosConStock() {
-        List<Producto> productos = productoService.getProductosConStock();
-        return ResponseEntity.ok(productos);
+        return ResponseEntity.ok(productoService.getProductosConStock());
     }
-    
+
     @GetMapping("/buscar/codigo/{codigo}")
     public ResponseEntity<Producto> getProductoByCodigo(@PathVariable String codigo) {
         return productoService.getProductoByCodigo(codigo)
