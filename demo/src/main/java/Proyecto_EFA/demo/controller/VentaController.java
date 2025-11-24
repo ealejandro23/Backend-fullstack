@@ -52,15 +52,14 @@ public class VentaController {
     @Autowired
     private ProductoService productoService;
 
-    // ✅ MÉTODO ACTUALIZADO para crear ventas
     @PostMapping
     public ResponseEntity<?> createVenta(@RequestBody VentaRequest ventaRequest) {
         try {
-            System.out.println("🛒 Recibiendo solicitud de venta: " + ventaRequest);
+            System.out.println(" Recibiendo solicitud de venta: " + ventaRequest);
             
             // Validar que hay items
             if (ventaRequest.getItems() == null || ventaRequest.getItems().isEmpty()) {
-                return ResponseEntity.badRequest().body("❌ La venta debe tener al menos un producto");
+                return ResponseEntity.badRequest().body(" La venta debe tener al menos un producto");
             }
 
             // Crear la venta
@@ -72,33 +71,33 @@ public class VentaController {
             // Buscar y asignar entidades relacionadas
             Usuario usuario = usuarioService.getUsuarioById(ventaRequest.getUsuarioId());
             if (usuario == null) {
-                return ResponseEntity.badRequest().body("❌ Usuario no encontrado");
+                return ResponseEntity.badRequest().body(" Usuario no encontrado");
             }
             venta.setUsuario(usuario);
 
             Estado estado = estadoService.getEstadoById(ventaRequest.getEstadoId());
             if (estado == null) {
-                return ResponseEntity.badRequest().body("❌ Estado no encontrado");
+                return ResponseEntity.badRequest().body("Estado no encontrado");
             }
             venta.setEstado(estado);
 
             MetodoPago metodoPago = metodoPagoService.getMetodoPagoById(ventaRequest.getMetodoPagoId());
             if (metodoPago == null) {
-                return ResponseEntity.badRequest().body("❌ Método de pago no encontrado");
+                return ResponseEntity.badRequest().body("Método de pago no encontrado");
             }
             venta.setMetodoPago(metodoPago);
 
             MetodoEnvio metodoEnvio = metodoEnvioService.getMetodoEnvioById(ventaRequest.getMetodoEnvioId());
             if (metodoEnvio == null) {
-                return ResponseEntity.badRequest().body("❌ Método de envío no encontrado");
+                return ResponseEntity.badRequest().body("Método de envío no encontrado");
             }
             venta.setMetodoEnvio(metodoEnvio);
 
-            // ✅ PROCESAR ITEMS DE LA VENTA
+            //PROCESAR ITEMS DE LA VENTA
             for (ItemVentaRequest itemRequest : ventaRequest.getItems()) {
                 Producto producto = productoService.getProductoById(itemRequest.getProductoId());
                 if (producto == null) {
-                    return ResponseEntity.badRequest().body("❌ Producto no encontrado: " + itemRequest.getProductoId());
+                    return ResponseEntity.badRequest().body("Producto no encontrado: " + itemRequest.getProductoId());
                 }
 
                 // Crear ProductoVenta
@@ -106,14 +105,14 @@ public class VentaController {
                 productoVenta.setVenta(venta);
                 productoVenta.setProducto(producto);
                 productoVenta.setCantidad(itemRequest.getCantidad());
-                productoVenta.setPrecioUnitario(itemRequest.getPrecio());
-                productoVenta.setSubtotal(itemRequest.getPrecio() * itemRequest.getCantidad());
+                productoVenta.setPrecioUnitario(itemRequest.getPrecioUnitario());
+                productoVenta.setSubtotal(itemRequest.getPrecioUnitario() * itemRequest.getCantidad());
 
                 // Agregar a la venta
                 venta.getItems().add(productoVenta);
             }
 
-            System.out.println("💰 Venta creada con " + venta.getItems().size() + " productos");
+            System.out.println("Venta creada con " + venta.getItems().size() + " productos");
             
             // Guardar la venta (esto activará el @PrePersist que calcula el total)
             Venta ventaCreada = ventaService.createVenta(venta);
@@ -121,13 +120,12 @@ public class VentaController {
             return ResponseEntity.status(201).body(ventaCreada);
             
         } catch (Exception e) {
-            System.err.println("❌ Error creando venta: " + e.getMessage());
+            System.err.println("Error creando venta: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Error al crear la venta: " + e.getMessage());
         }
     }
 
-    // ✅ MÉTODO ORIGINAL (para mantener compatibilidad)
     @PostMapping("/original")
     public ResponseEntity<Venta> createVentaOriginal(@RequestBody Venta venta) {
         Venta createdVenta = ventaService.createVenta(venta);
