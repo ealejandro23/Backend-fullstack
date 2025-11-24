@@ -1,67 +1,94 @@
 package Proyecto_EFA.demo.service;
 
-import java.io.IOException;
-import java.util.Map;
-
+import Proyecto_EFA.demo.model.Imagen; 
+import Proyecto_EFA.demo.model.Producto;
+import Proyecto_EFA.demo.repository.ProductoRepository; 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
-
-import Proyecto_EFA.demo.model.Producto;
-import Proyecto_EFA.demo.repository.ProductoRepository;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ProductoService {
 
     @Autowired
     private ProductoRepository productoRepository;
-
+    
     @Autowired
-    private Cloudinary cloudinary;
-    public String uploadImage(MultipartFile file) throws IOException {
-
-        Map<?, ?> uploadResult = cloudinary.uploader().upload(
-                file.getBytes(),
-                ObjectUtils.asMap("folder", "efa_productos")
-        );
-        return uploadResult.get("secure_url").toString();  
-    }
-    public Producto createProductoWithImage(Producto producto, MultipartFile imageFile) throws IOException {
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageUrl = uploadImage(imageFile);
-            producto.setImagenUrl(imageUrl);
+    private CloudinaryService cloudinaryService;
+    
+    @Autowired
+    private ImagenService imagenService; 
+    public Imagen addImageToProducto(Integer productoId, MultipartFile file) throws IOException {
+        
+        Optional<Producto> optionalProducto = productoRepository.findById(productoId);
+        if (optionalProducto.isEmpty()) {
+            throw new IOException("Producto no encontrado con ID: " + productoId);
         }
+        
+        Producto producto = optionalProducto.get();
 
+        Map<?, ?> uploadResult = cloudinaryService.uploadImage(file);
+        
+        String imageUrl = uploadResult.get("url").toString();
+        String publicId = uploadResult.get("public_id").toString(); 
+
+        Imagen nuevaImagen = new Imagen();
+        nuevaImagen.setUrl(imageUrl);
+        nuevaImagen.setPublicId(publicId);
+        nuevaImagen.setProducto(producto); 
+
+        return imagenService.createImagen(nuevaImagen);
+    }
+
+    public List<Producto> getAllProductos() {
+        List<Producto> productos = productoRepository.findAll();
+        productos.forEach(producto -> producto.getImagenes().size());
+        return productos;
+    }
+
+    public Producto getProductoById(Integer id) {
+        return productoRepository.findById(id).map(producto -> {
+            producto.getImagenes().size(); 
+            return producto;
+        }).orElse(null);
+    }
+    
+    public Producto createProducto(Producto producto) {
         return productoRepository.save(producto);
     }
-
-    // OBTENER TODOS LOS PRODUCTOS
-    public Iterable<Producto> getAllProductos() {
-        return productoRepository.findAll();
+    
+    public Producto updateProducto(Integer id, Producto productoDetails) {
+        Optional<Producto> optionalProducto = productoRepository.findById(id);
+        if (optionalProducto.isPresent()) {
+            Producto producto = optionalProducto.get();
+            producto.setNombre(productoDetails.getNombre());
+            producto.setPrecio(productoDetails.getPrecio());
+            producto.setStock(productoDetails.getStock());
+            producto.setCodigo(productoDetails.getCodigo());
+            return productoRepository.save(producto);
+        }
+        return null;
     }
 
-    // OBTENER POR ID
-    public Producto getProductoById(Integer id) {
-        return productoRepository.findById(id).orElse(null);
-    }
-
-    // ELIMINAR
     public void deleteProducto(Integer id) {
         productoRepository.deleteById(id);
     }
 
-    // ACTUALIZAR
-    public Producto updateProducto(Integer id, Producto updated) {
-        return productoRepository.findById(id).map(p -> {
-            p.setNombre(updated.getNombre());
-            p.setPrecio(updated.getPrecio());
-            p.setDescripcion(updated.getDescripcion());
-            p.setStock(updated.getStock());
-            return productoRepository.save(p);
-        }).orElse(null);
-    }
+    public List<Producto> findProductosByFilters(String categoria, String genero) { return List.of(); } 
+    public List<Producto> getProductosByMarca(Integer marcaId) { return List.of(); }
+    public List<Producto> getProductosByCategoria(Integer categoriaId) { return List.of(); }
+    public List<Producto> getProductosByColor(Integer colorId) { return List.of(); }
+    public List<Producto> getProductosByMaterial(Integer materialId) { return List.of(); }
+    public List<Producto> getProductosByTalla(Integer tallaId) { return List.of(); }
+    public List<Producto> getProductosByPriceRange(Double precioMin, Double PrecioMax) { return List.of(); }
+    public List<Producto> searchProductosByNombre(String nombre) { return List.of(); }
+    public List<Producto> getProductosByMarcaAndCategoria(Integer marcaId, Integer categoriaId) { return List.of(); }
+    public List<Producto> getTop10MostExpensiveProducts() { return List.of(); }
+    public List<Producto> getTop10CheapestProducts() { return List.of(); }
+    public List<Producto> getProductosConStock() { return List.of(); }
+    public Optional<Producto> getProductoByCodigo(String codigo) { return Optional.empty(); }
 }
