@@ -55,8 +55,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-		
-		<!-- ⭐️ DEPENDENCIAS DE CLOUDINARY PARA SUBIDA DE IMÁGENES ⭐️ -->
 		<dependency>
 			<groupId>com.cloudinary</groupId>
 			<artifactId>cloudinary-httpclient</artifactId>
@@ -65,18 +63,13 @@
 		<dependency>
 			<groupId>com.cloudinary</groupId>
 			<artifactId>cloudinary-core</artifactId>
-			<version>1.38.0</version>
+			<version>1.37.0</version>
 		</dependency>
-		<!-- FIN DEPENDENCIAS DE CLOUDINARY -->
-		
-		<!-- DEPENDENCIA DE POSTGRESQL (CORRECTO) -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		
-		<!-- H2 para desarrollo local -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -93,7 +86,6 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
