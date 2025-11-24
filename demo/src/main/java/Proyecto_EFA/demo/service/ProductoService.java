@@ -130,4 +130,42 @@ public class ProductoService {
         return productoRepository.findByCodigo(codigo);
     }
 
+    public List<Producto> getProductosByCategoriaNombre(String categoriaNombre) {
+        return productoRepository.findByCategoriaNombre(categoriaNombre);
+    }
+
+    public List<Producto> getProductosBySubcategoria(String subcategoria) {
+        return productoRepository.findBySubcategoria(subcategoria);
+    }
+
+    public List<Producto> getProductosByCategoriaAndSubcategoria(String categoriaNombre, String subcategoria) {
+        return productoRepository.findByCategoriaNombreAndSubcategoria(categoriaNombre, subcategoria);
+    }
+
+    public List<Producto> getProductosByFiltros(String categoria, String subcategoria, String genero) {
+        // Implementación sencilla y flexible en memoria: recuperar todos y filtrar.
+        List<Producto> resultados = productoRepository.findAll();
+
+        if (categoria != null && !categoria.isBlank()) {
+            String cat = categoria.toLowerCase();
+            resultados.removeIf(p -> p.getCategorias() == null || p.getCategorias().getNombre() == null || !p.getCategorias().getNombre().toLowerCase().contains(cat));
+        }
+
+        if (subcategoria != null && !subcategoria.isBlank()) {
+            String sub = subcategoria.toLowerCase();
+            resultados.removeIf(p -> p.getCategorias() == null || (
+                    (p.getCategorias().getDescripcion() == null || !p.getCategorias().getDescripcion().toLowerCase().contains(sub))
+                    && (p.getCategorias().getNombre() == null || !p.getCategorias().getNombre().toLowerCase().contains(sub))
+            ));
+        }
+
+        if (genero != null && !genero.isBlank()) {
+            String gen = genero.toLowerCase();
+            // Como no hay campo genero en Producto, intentamos mapearlo contra categorias.nombre
+            resultados.removeIf(p -> p.getCategorias() == null || p.getCategorias().getNombre() == null || !p.getCategorias().getNombre().toLowerCase().contains(gen));
+        }
+
+        return resultados;
+    }
+
 }

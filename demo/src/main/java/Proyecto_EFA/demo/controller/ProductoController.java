@@ -140,4 +140,37 @@ public class ProductoController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/buscar/categoria-nombre/{categoriaNombre}")
+    public ResponseEntity<List<Producto>> getProductosByCategoriaNombre(@PathVariable String categoriaNombre) {
+        List<Producto> productos = productoService.getProductosByCategoriaNombre(categoriaNombre);
+        return ResponseEntity.ok(productos);
+    }
+
+    @GetMapping("/buscar/subcategoria/{subcategoria}")
+    public ResponseEntity<List<Producto>> getProductosBySubcategoria(@PathVariable String subcategoria) {
+        List<Producto> productos = productoService.getProductosBySubcategoria(subcategoria);
+        return ResponseEntity.ok(productos);
+    }
+
+    @GetMapping("/buscar/categoria-nombre/{categoriaNombre}/subcategoria/{subcategoria}")
+    public ResponseEntity<List<Producto>> getProductosByCategoriaAndSubcategoria(
+            @PathVariable String categoriaNombre, 
+            @PathVariable String subcategoria) {
+        List<Producto> productos = productoService.getProductosByCategoriaAndSubcategoria(categoriaNombre, subcategoria);
+        return ResponseEntity.ok(productos);
+    }
+
+    // Endpoint flexible con query parameters
+    @GetMapping("/buscar/filtros")
+    public ResponseEntity<List<Producto>> getProductosByFiltros(
+            @RequestParam(required = false) String categoria,
+            @RequestParam(required = false) String subcategoria,
+            @RequestParam(required = false) String genero) {
+        
+        List<Producto> productos = productoService.getProductosByFiltros(categoria, subcategoria, genero);
+        return ResponseEntity.ok(productos);
+    }
+
+    
 }
