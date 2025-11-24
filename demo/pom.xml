@@ -55,16 +55,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.cloudinary</groupId>
-			<artifactId>cloudinary-httpclient</artifactId>
-			<version>1.33.0</version>
-		</dependency>
+		
+		<!-- ⭐️ DEPENDENCIAS DE CLOUDINARY (Versión 1.30.0, solo CORE) ⭐️ -->
+		<!-- Esta es la versión mínima y más estable, evitando problemas de cliente HTTP. -->
 		<dependency>
 			<groupId>com.cloudinary</groupId>
 			<artifactId>cloudinary-core</artifactId>
-			<version>1.33.0</version>
+			<version>1.30.0</version>
 		</dependency>
+		
+		<!-- DEPENDENCIA DE POSTGRESQL -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
