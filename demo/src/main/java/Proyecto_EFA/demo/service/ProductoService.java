@@ -31,10 +31,6 @@ public class ProductoService {
     @Autowired
     private Cloudinary cloudinary; 
 
-    // ----------------------------------------------------------------------
-    // MÉTODOS DE CLOUDINARY
-    // ----------------------------------------------------------------------
-    
     public String uploadImage(MultipartFile file) throws IOException {
         Map<?, ?> uploadResult = cloudinary.uploader().upload(
             file.getBytes(), 
@@ -53,10 +49,6 @@ public class ProductoService {
         
         return productoRepository.save(producto);
     }
-
-    // ----------------------------------------------------------------------
-    // MÉTODOS CRUD Y FILTROS EXISTENTES
-    // ----------------------------------------------------------------------
 
     public List<Producto> getAllProductos() {
         return productoRepository.findAll();
