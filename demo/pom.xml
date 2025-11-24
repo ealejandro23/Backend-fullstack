@@ -56,7 +56,7 @@
         <dependency>
             <groupId>com.cloudinary</groupId>
             <artifactId>cloudinary-core</artifactId>
-            <version>1.30.0</version>
+            <version>1.36.0</version>
         </dependency>
 
         <!-- POSTGRESQL -->
