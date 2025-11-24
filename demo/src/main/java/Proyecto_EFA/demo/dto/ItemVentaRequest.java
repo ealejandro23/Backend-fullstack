@@ -6,8 +6,8 @@ import lombok.Data;
 public class ItemVentaRequest {
     private Integer productoId;
     private Integer cantidad;
-    private Double precioUnitario;  // ✅ CAMBIADO de "precio" a "precioUnitario"
-    private Double subtotal;        // ✅ AGREGADO subtotal
+    private Double precioUnitario;  
+    private Double subtotal;      
     
     public ItemVentaRequest() {}
     
