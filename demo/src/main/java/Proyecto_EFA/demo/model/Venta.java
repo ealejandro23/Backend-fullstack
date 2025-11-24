@@ -54,15 +54,13 @@ public class Venta {
     @JsonIgnoreProperties("ventas")
     private MetodoEnvio metodoEnvio;
 
-    // ✅ ESTE CAMPO ES CRÍTICO - debe existir
-    @Column(nullable = false)
+    @Column(nullable = true) 
     private Double total;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ProductoVenta> items = new ArrayList<>();
 
-    // ✅ Método para calcular el total automáticamente
     @PrePersist
     @PreUpdate
     public void calcularTotal() {
