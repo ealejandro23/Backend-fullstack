@@ -156,3 +156,11 @@ class LoginRequest {
 @Data
 class TokenResponse {
     private String token;
+    private Usuario usuario;
+    
+    public TokenResponse(String token, Usuario usuario) {
+        this.token = token;
+        usuario.setContrasena(null); 
+        this.usuario = usuario;
+    }
+}
