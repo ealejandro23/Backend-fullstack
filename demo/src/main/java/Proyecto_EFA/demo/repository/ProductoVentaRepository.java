@@ -18,7 +18,7 @@ public interface ProductoVentaRepository extends JpaRepository<ProductoVenta, In
     List<ProductoVenta> findByProductoId(@Param("productoId") Integer productoId);
     
     @Query("SELECT pv FROM ProductoVenta pv WHERE pv.venta.id = :ventaId AND pv.producto.id = :productoId")
-    ProductoVenta findByVentaIdAndProductoId(@Param("ventaId") Long ventaId, @Param("productoId") Integer productoId);
+    ProductoVenta findByVentaIdAndProductoId(@Param("ventaId") Integer ventaId, @Param("productoId") Integer productoId);
 
     @Query("SELECT SUM(pv.cantidad) FROM ProductoVenta pv WHERE pv.producto.id = :productoId")
     Integer getTotalQuantitySoldByProducto(@Param("productoId") Integer productoId);
