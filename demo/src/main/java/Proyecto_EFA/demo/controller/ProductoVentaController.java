@@ -31,7 +31,7 @@ public class ProductoVentaController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ProductoVenta> getProductoVentaById(@PathVariable Long id) {
+    public ResponseEntity<ProductoVenta> getProductoVentaById(@PathVariable Integer id) {
         Optional<ProductoVenta> productoVenta = productoVentaService.getProductoVentaById(id);
         return productoVenta.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -52,13 +52,13 @@ public class ProductoVentaController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProductoVenta(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteProductoVenta(@PathVariable Integer id) {
         productoVentaService.deleteProductoVenta(id);
         return ResponseEntity.ok().build();
     }
     
     @GetMapping("/venta/{ventaId}")
-    public ResponseEntity<List<ProductoVenta>> getProductoVentasByVenta(@PathVariable Long ventaId) {
+    public ResponseEntity<List<ProductoVenta>> getProductoVentasByVenta(@PathVariable Integer ventaId) {
         List<ProductoVenta> list = productoVentaService.getProductoVentasByVenta(ventaId);
         return ResponseEntity.ok(list);
     }
@@ -70,7 +70,7 @@ public class ProductoVentaController {
     }
     
     @GetMapping("/venta/{ventaId}/producto/{productoId}")
-    public ResponseEntity<ProductoVenta> getProductoVentaByVentaAndProducto(@PathVariable Long ventaId, @PathVariable Integer productoId) {
+    public ResponseEntity<ProductoVenta> getProductoVentaByVentaAndProducto(@PathVariable Integer ventaId, @PathVariable Integer productoId) {
         ProductoVenta pv = productoVentaService.getProductoVentaByVentaAndProducto(ventaId, productoId);
         if (pv != null) {
             return ResponseEntity.ok(pv);
@@ -97,7 +97,7 @@ public class ProductoVentaController {
     }
 
     @GetMapping("/venta/{ventaId}/contar-items")
-    public ResponseEntity<Integer> countItemsByVenta(@PathVariable Long ventaId) {
+    public ResponseEntity<Integer> countItemsByVenta(@PathVariable Integer ventaId) {
         Integer count = productoVentaService.countItemsByVenta(ventaId);
         return ResponseEntity.ok(count);
     }
