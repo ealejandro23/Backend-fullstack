@@ -20,26 +20,32 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public Usuario create(Usuario nuevoUsuario) {
+    public Usuario create(Usuario nuevoUsuarioData) {
         
-        if (usuarioRepository.findByCorreo(nuevoUsuario.getCorreo()) != null) {
+        if (usuarioRepository.findByCorreo(nuevoUsuarioData.getCorreo()) != null) {
             throw new DataIntegrityViolationException("El correo ya está registrado.");
         }
         
-        if (nuevoUsuario.getContrasena() == null || nuevoUsuario.getContrasena().isEmpty()) {
+        if (nuevoUsuarioData.getContrasena() == null || nuevoUsuarioData.getContrasena().isEmpty()) {
              throw new IllegalArgumentException("La contraseña no puede ser nula.");
         }
-        
-        String encodedPassword = passwordEncoder.encode(nuevoUsuario.getContrasena());
+ 
+        Usuario nuevoUsuario = new Usuario();
+        nuevoUsuario.setNombre(nuevoUsuarioData.getNombre());
+        nuevoUsuario.setCorreo(nuevoUsuarioData.getCorreo());
+
+
+        String encodedPassword = passwordEncoder.encode(nuevoUsuarioData.getContrasena());
         nuevoUsuario.setContrasena(encodedPassword);
 
+
         Usuario savedUsuario = usuarioRepository.save(nuevoUsuario);
-        usuarioRepository.flush();
 
         return savedUsuario;
     }
     
     public Usuario save(Usuario usuario) {
+
         if (usuario.getContrasena() != null && !usuario.getContrasena().isEmpty()) {
             String encodedPassword = passwordEncoder.encode(usuario.getContrasena());
             usuario.setContrasena(encodedPassword);
@@ -88,6 +94,7 @@ public class UsuarioService {
     public Usuario partialUpdateUsuario(Integer id, Usuario usuarioDetails) {
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
         if (usuario != null) {
+
             if (usuarioDetails.getNombre() != null) {
                 usuario.setNombre(usuarioDetails.getNombre());
             }
