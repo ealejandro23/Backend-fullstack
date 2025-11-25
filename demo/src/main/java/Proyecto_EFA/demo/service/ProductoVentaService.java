@@ -59,7 +59,7 @@ public class ProductoVentaService {
         return productoVentaRepository.findByProductoId(productoId);
     }
     
-    public ProductoVenta getProductoVentaByVentaAndProducto(Long ventaId, Integer productoId) {
+    public ProductoVenta getProductoVentaByVentaAndProducto(Integer ventaId, Integer productoId) {
         return productoVentaRepository.findByVentaIdAndProductoId(ventaId, productoId);
     }
 
