@@ -14,12 +14,11 @@ public class VentaService {
     @Autowired
     private VentaRepository ventaRepository;
 
-    // CRUD básico
     public List<Venta> getAllVentas() {
         return ventaRepository.findAll();
     }
 
-    public Venta getVentaById(Long id) {
+    public Venta getVentaById(Integer id) {
         return ventaRepository.findById(id).orElse(null);
     }
 
@@ -27,7 +26,7 @@ public class VentaService {
         return ventaRepository.save(venta);
     }
 
-    public Venta updateVenta(Long id, Venta ventaDetails) {
+    public Venta updateVenta(Integer id, Venta ventaDetails) {
         Venta venta = ventaRepository.findById(id).orElse(null);
         if (venta != null) {
             if (ventaDetails.getNumeroVenta() != null) {
@@ -53,11 +52,10 @@ public class VentaService {
         return null;
     }
 
-    public void deleteVenta(Long id) {
+    public void deleteVenta(Integer id) {
         ventaRepository.deleteById(id);
     }
     
-    // Métodos de búsqueda avanzados
     public List<Venta> getVentasByUsuario(Integer usuarioId) {
         return ventaRepository.findByUsuarioId(usuarioId);
     }
@@ -93,5 +91,4 @@ public class VentaService {
     public List<Venta> getVentasByUsuarioAndEstado(Integer usuarioId, Integer estadoId) {
         return ventaRepository.findByUsuarioIdAndEstadoId(usuarioId, estadoId);
     }
-
 }
