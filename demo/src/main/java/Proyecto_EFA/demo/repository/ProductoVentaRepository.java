@@ -9,10 +9,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ProductoVentaRepository extends JpaRepository<ProductoVenta, Long> {
+public interface ProductoVentaRepository extends JpaRepository<ProductoVenta, Integer> {
     
     @Query("SELECT pv FROM ProductoVenta pv WHERE pv.venta.id = :ventaId")
-    List<ProductoVenta> findByVentaId(@Param("ventaId") Long ventaId);
+    List<ProductoVenta> findByVentaId(@Param("ventaId") Integer ventaId);
     
     @Query("SELECT pv FROM ProductoVenta pv WHERE pv.producto.id = :productoId")
     List<ProductoVenta> findByProductoId(@Param("productoId") Integer productoId);
@@ -38,5 +38,5 @@ public interface ProductoVentaRepository extends JpaRepository<ProductoVenta, Lo
     List<Object[]> findAllSellingProducts();
 
     @Query("SELECT COUNT(pv) FROM ProductoVenta pv WHERE pv.venta.id = :ventaId")
-    Integer countItemsByVenta(@Param("ventaId") Long ventaId);
+    Integer countItemsByVenta(@Param("ventaId") Integer ventaId);
 }
