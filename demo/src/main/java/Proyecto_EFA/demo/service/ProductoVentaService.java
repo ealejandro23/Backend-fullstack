@@ -18,7 +18,7 @@ public class ProductoVentaService {
         return productoVentaRepository.findAll();
     }
     
-    public Optional<ProductoVenta> getProductoVentaById(Long id) {
+    public Optional<ProductoVenta> getProductoVentaById(Integer id) {
         return productoVentaRepository.findById(id);
     }
     
@@ -26,7 +26,7 @@ public class ProductoVentaService {
         return productoVentaRepository.save(productoVenta);
     }
     
-    public ProductoVenta updateProductoVenta(Long id, ProductoVenta productoVentaDetails) {
+    public ProductoVenta updateProductoVenta(Integer id, ProductoVenta productoVentaDetails) {
         Optional<ProductoVenta> existingProductoVenta = productoVentaRepository.findById(id);
         if (existingProductoVenta.isPresent()) {
             ProductoVenta pv = existingProductoVenta.get();
@@ -47,11 +47,11 @@ public class ProductoVentaService {
         return null;
     }
     
-    public void deleteProductoVenta(Long id) {
+    public void deleteProductoVenta(Integer id) {
         productoVentaRepository.deleteById(id);
     }
     
-    public List<ProductoVenta> getProductoVentasByVenta(Long ventaId) {
+    public List<ProductoVenta> getProductoVentasByVenta(Integer ventaId) {
         return productoVentaRepository.findByVentaId(ventaId);
     }
     
@@ -89,7 +89,7 @@ public class ProductoVentaService {
         return allResults.stream().limit(limit).toList();
     }
     
-    public Integer countItemsByVenta(Long ventaId) {
+    public Integer countItemsByVenta(Integer ventaId) {
         Integer result = productoVentaRepository.countItemsByVenta(ventaId);
         return result != null ? result : 0;
     }
