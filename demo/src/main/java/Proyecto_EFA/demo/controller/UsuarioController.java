@@ -1,8 +1,10 @@
 package Proyecto_EFA.demo.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import Proyecto_EFA.demo.model.Usuario;
 import Proyecto_EFA.demo.service.UsuarioService;
+import lombok.Data;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
@@ -25,7 +28,36 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+    
+    @PostMapping
+    public ResponseEntity<?> createUsuario(@RequestBody Usuario usuario) {
+        try {
+            usuario.setId(null);
+            Usuario usuarioNew = usuarioService.create(usuario);
+            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioNew);
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("msg", "El correo ya está registrado o faltan datos obligatorios."));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("msg", "Error al crear el usuario."));
+        }
+    }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        Usuario usuarioAutenticado = usuarioService.login(loginRequest.getCorreo(), loginRequest.getContrasena());
+
+        if (usuarioAutenticado != null) {
+            TokenResponse response = new TokenResponse(
+                "MOCK_TOKEN_JWT",
+                usuarioAutenticado
+            );
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                 .body(Map.of("msg", "Credenciales inválidas."));
+        }
+    }
+    
     @GetMapping
     public ResponseEntity<List<Usuario>> getAllUsuarios() {
         List<Usuario> usuarios = usuarioService.getAllUsers();
@@ -44,18 +76,6 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario);
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Usuario usuario) {
-        String identifier = usuario.getCorreo() != null && !usuario.getCorreo().isEmpty() ? usuario.getCorreo() : usuario.getNombre();
-        Usuario login = usuarioService.login(identifier, usuario.getContrasena());
-        if (login != null) {
-            login.setContrasena(null);
-            return ResponseEntity.ok(login);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
-        }
-    }
-
     @GetMapping("/search")
     public ResponseEntity<List<Usuario>> searchUsuarios(@RequestParam String nombre) {
         List<Usuario> usuarios = usuarioService.searchByNombre(nombre);
@@ -63,13 +83,6 @@ public class UsuarioController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(usuarios);
-    }
-
-    @PostMapping
-    public ResponseEntity<Usuario> createUsuario(@RequestBody Usuario usuario) {
-        usuario.setId(null);
-        Usuario usuarioNew = usuarioService.save(usuario);
-        return ResponseEntity.status(201).body(usuarioNew);
     }
 
     @PutMapping("/{id}")
@@ -133,3 +146,13 @@ public class UsuarioController {
         return ResponseEntity.ok(count);
     }
 }
+
+@Data
+class LoginRequest {
+    private String correo;
+    private String contrasena;
+}
+
+@Data
+class TokenResponse {
+    private String token;
