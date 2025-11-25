@@ -138,25 +138,25 @@ public class VentaController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Venta> getVentaById(@PathVariable Long id) {
+    public ResponseEntity<Venta> getVentaById(@PathVariable Integer id) {
         Venta venta = ventaService.getVentaById(id);
         return venta != null ? ResponseEntity.ok(venta) : ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Venta> updateVenta(@PathVariable Long id, @RequestBody Venta ventaDetails) {
+    public ResponseEntity<Venta> updateVenta(@PathVariable Integer id, @RequestBody Venta ventaDetails) {
         Venta updated = ventaService.updateVenta(id, ventaDetails);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Venta> partialUpdateVenta(@PathVariable Long id, @RequestBody Venta ventaDetails) {
+    public ResponseEntity<Venta> partialUpdateVenta(@PathVariable Integer id, @RequestBody Venta ventaDetails) {
         Venta updated = ventaService.updateVenta(id, ventaDetails);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVenta(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteVenta(@PathVariable Integer id) {
         ventaService.deleteVenta(id);
         return ResponseEntity.noContent().build();
     }
