@@ -33,7 +33,8 @@ public class UsuarioService {
         Usuario nuevoUsuario = new Usuario();
         nuevoUsuario.setNombre(nuevoUsuarioData.getNombre());
         nuevoUsuario.setCorreo(nuevoUsuarioData.getCorreo());
-
+        nuevoUsuario.setRol(nuevoUsuarioData.getRol());
+        nuevoUsuario.setDireccion(nuevoUsuarioData.getDireccion());
 
         String encodedPassword = passwordEncoder.encode(nuevoUsuarioData.getContrasena());
         nuevoUsuario.setContrasena(encodedPassword);
@@ -45,7 +46,6 @@ public class UsuarioService {
     }
     
     public Usuario save(Usuario usuario) {
-
         if (usuario.getContrasena() != null && !usuario.getContrasena().isEmpty()) {
             String encodedPassword = passwordEncoder.encode(usuario.getContrasena());
             usuario.setContrasena(encodedPassword);
@@ -57,8 +57,18 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByCorreo(correo); 
 
         if (usuario != null && passwordEncoder.matches(contrasena, usuario.getContrasena())) {
-            usuario.setContrasena(null);
-            return usuario;
+            
+            Usuario usuarioCopy = new Usuario();
+            usuarioCopy.setId(usuario.getId());
+            usuarioCopy.setNombre(usuario.getNombre());
+            usuarioCopy.setCorreo(usuario.getCorreo());
+            
+            usuarioCopy.setRol(usuario.getRol());         
+            usuarioCopy.setDireccion(usuario.getDireccion());
+            
+            usuarioCopy.setContrasena(null); 
+            
+            return usuarioCopy;
         }
         return null;
     }
@@ -66,7 +76,7 @@ public class UsuarioService {
     public List<Usuario> getAllUsers() {
         List<Usuario> usuarios = usuarioRepository.findAll();
         for (Usuario usuario : usuarios) {
-            usuario.setContrasena(null);
+            usuario.setContrasena(null); 
         }
         return usuarios;
     }
