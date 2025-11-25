@@ -13,13 +13,41 @@ import Proyecto_EFA.demo.repository.UsuarioRepository;
 @Transactional
 @SuppressWarnings("null")
 public class UsuarioService {
-    
+     
     @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // CRUD básico
+    public Usuario create(Usuario nuevoUsuario) {
+
+        if (usuarioRepository.findByCorreo(nuevoUsuario.getCorreo()) != null) {
+
+        }
+        String encodedPassword = passwordEncoder.encode(nuevoUsuario.getContrasena());
+        nuevoUsuario.setContrasena(encodedPassword);
+
+        return usuarioRepository.save(nuevoUsuario);
+    }
+    
+    public Usuario save(Usuario usuario) {
+        if (usuario.getContrasena() != null && !usuario.getContrasena().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(usuario.getContrasena());
+            usuario.setContrasena(encodedPassword);
+        }
+        return usuarioRepository.save(usuario);
+    }
+
+    public Usuario login(String correo, String contrasena) {
+        Usuario usuario = usuarioRepository.findByCorreo(correo); 
+
+        if (usuario != null && passwordEncoder.matches(contrasena, usuario.getContrasena())) {
+            usuario.setContrasena(null);
+            return usuario;
+        }
+        return null;
+    }
+
     public List<Usuario> getAllUsers() {
         List<Usuario> usuarios = usuarioRepository.findAll();
         for (Usuario usuario : usuarios) {
@@ -34,18 +62,6 @@ public class UsuarioService {
             usuario.setContrasena(null);
         }
         return usuario;
-    }      
-
-    public Usuario login(String nombreUsuario, String contrasena) {
-        Usuario usuario = usuarioRepository.findByNombre(nombreUsuario);
-        if (usuario == null) {
-            usuario = usuarioRepository.findByCorreo(nombreUsuario);
-        }
-        if (usuario != null && passwordEncoder.matches(contrasena, usuario.getContrasena())) {
-            usuario.setContrasena(null);
-            return usuario;
-        }
-        return null;
     }
 
     public List<Usuario> searchByNombre(String nombre) {
@@ -60,14 +76,6 @@ public class UsuarioService {
         return save(usuario);
     }
 
-    public Usuario save(Usuario usuario) {
-        if (usuario.getContrasena() != null) {
-            String encodedPassword = passwordEncoder.encode(usuario.getContrasena());
-            usuario.setContrasena(encodedPassword);
-        }
-        return usuarioRepository.save(usuario);
-    }
-
     public Usuario partialUpdateUsuario(Integer id, Usuario usuarioDetails) {
         Usuario usuario = usuarioRepository.findById(id).orElse(null);
         if (usuario != null) {
@@ -77,7 +85,7 @@ public class UsuarioService {
             if (usuarioDetails.getCorreo() != null) {
                 usuario.setCorreo(usuarioDetails.getCorreo());
             }
-            if (usuarioDetails.getContrasena() != null) {
+            if (usuarioDetails.getContrasena() != null && !usuarioDetails.getContrasena().isEmpty()) { // Añadido chequeo de vacío
                 String encodedPassword = passwordEncoder.encode(usuarioDetails.getContrasena());
                 usuario.setContrasena(encodedPassword);
             }
@@ -95,8 +103,7 @@ public class UsuarioService {
     public void deleteUsuario(Integer id) {
         usuarioRepository.deleteById(id);
     }
-    
-    // Métodos de búsqueda avanzados
+
     public List<Usuario> getUsuariosByRol(Integer rolId) {
         List<Usuario> usuarios = usuarioRepository.findByRolId(rolId);
         for (Usuario u : usuarios) {
@@ -138,12 +145,11 @@ public class UsuarioService {
     }
     
     public int countByRol(Integer rolId) {
-        return 
-        usuarioRepository.countByRol(rolId);
+        return usuarioRepository.countByRol(rolId);
     }
 
     public Usuario getUsuarioById(Integer id) {
-    return usuarioRepository.findById(id).orElse(null);
-}
+        return usuarioRepository.findById(id).orElse(null);
+    }
 
 }
