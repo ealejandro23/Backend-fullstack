@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import Proyecto_EFA.demo.model.Venta;
 
-public interface VentaRepository extends JpaRepository<Venta, Long> {
+public interface VentaRepository extends JpaRepository<Venta, Integer> {
 	
 	@Query("SELECT v FROM Venta v WHERE v.usuario.id = :usuarioId")
 	List<Venta> findByUsuarioId(@Param("usuarioId") Integer usuarioId);
