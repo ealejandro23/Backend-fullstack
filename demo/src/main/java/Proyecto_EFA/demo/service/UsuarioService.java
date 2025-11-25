@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import Proyecto_EFA.demo.model.Usuario;
 import Proyecto_EFA.demo.repository.UsuarioRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Service
 @Transactional
@@ -20,14 +21,22 @@ public class UsuarioService {
     private PasswordEncoder passwordEncoder;
 
     public Usuario create(Usuario nuevoUsuario) {
-
+        
         if (usuarioRepository.findByCorreo(nuevoUsuario.getCorreo()) != null) {
-
+            throw new DataIntegrityViolationException("El correo ya está registrado.");
         }
+        
+        if (nuevoUsuario.getContrasena() == null || nuevoUsuario.getContrasena().isEmpty()) {
+             throw new IllegalArgumentException("La contraseña no puede ser nula.");
+        }
+        
         String encodedPassword = passwordEncoder.encode(nuevoUsuario.getContrasena());
         nuevoUsuario.setContrasena(encodedPassword);
 
-        return usuarioRepository.save(nuevoUsuario);
+        Usuario savedUsuario = usuarioRepository.save(nuevoUsuario);
+        usuarioRepository.flush();
+
+        return savedUsuario;
     }
     
     public Usuario save(Usuario usuario) {
@@ -85,7 +94,7 @@ public class UsuarioService {
             if (usuarioDetails.getCorreo() != null) {
                 usuario.setCorreo(usuarioDetails.getCorreo());
             }
-            if (usuarioDetails.getContrasena() != null && !usuarioDetails.getContrasena().isEmpty()) { // Añadido chequeo de vacío
+            if (usuarioDetails.getContrasena() != null && !usuarioDetails.getContrasena().isEmpty()) {
                 String encodedPassword = passwordEncoder.encode(usuarioDetails.getContrasena());
                 usuario.setContrasena(encodedPassword);
             }
