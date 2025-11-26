@@ -73,7 +73,6 @@ public class ProductoVentaService {
         return result != null ? result : 0.0;
     }
     
-    // MÉTODOS CORREGIDOS para productos más vendidos
     public List<Object[]> getTop10SellingProducts() {
         return productoVentaRepository.findTop10SellingProducts();
     }
@@ -82,9 +81,7 @@ public class ProductoVentaService {
         return productoVentaRepository.findTop5SellingProducts();
     }
     
-    // Método alternativo si necesitas límite variable
     public List<Object[]> getTopSellingProducts(int limit) {
-        // Implementación manual si necesitas límite variable
         List<Object[]> allResults = productoVentaRepository.findAllSellingProducts();
         return allResults.stream().limit(limit).toList();
     }
