@@ -1,17 +1,16 @@
 package Proyecto_EFA.demo.controller;
 
-import java.io.IOException;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import Proyecto_EFA.demo.model.Imagen; 
 import Proyecto_EFA.demo.model.Producto;
 import Proyecto_EFA.demo.service.ProductoService;
+import Proyecto_EFA.demo.dto.ProductoCreationDTO;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.multipart.MultipartFile;
+import Proyecto_EFA.demo.model.Imagen;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/productos")
@@ -20,35 +19,26 @@ public class ProductoController {
     @Autowired
     private ProductoService productoService;
 
-    // ENDPOINT PARA AÑADIR IMAGEN A UN PRODUCTO EXISTENTE
-
     @PostMapping("/{productoId}/images")
     public ResponseEntity<?> addImageToProducto(
         @PathVariable Integer productoId,
-        @RequestPart("file") MultipartFile file      
+        @RequestPart("file") MultipartFile file     
     ) {
         try {
-            // Llamamos al servicio para subir y enlazar la imagen.
             Imagen nuevaImagen = productoService.addImageToProducto(productoId, file);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevaImagen);
         } catch (IOException e) {
-            // Manejo de errores si el producto no existe o falla la subida.
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Error al subir la imagen o enlazar al producto: " + e.getMessage());
         }
     }
 
-
-    // ENDPOINT BÁSICO DE CREACIÓN DE PRODUCTO
-
     @PostMapping 
-    public ResponseEntity<Producto> createProducto(@RequestBody Producto producto) {
-        Producto createdProducto = productoService.createProducto(producto);
+    public ResponseEntity<Producto> createProducto(@RequestBody ProductoCreationDTO productoDto) {
+        Producto createdProducto = productoService.createProducto(productoDto);
         return ResponseEntity.status(201).body(createdProducto);
     }
     
-    // ENDPOINTS CRUD Y FILTROS EXISTENTES
-
     @GetMapping 
     public ResponseEntity<List<Producto>> getProductosFiltrados(
         @RequestParam(required = false) String categoria,
@@ -68,7 +58,6 @@ public class ProductoController {
         return producto != null ? ResponseEntity.ok(producto) : ResponseEntity.notFound().build();
     }
     
-
     @PutMapping("/{id}")
     public ResponseEntity<Producto> updateProducto(@PathVariable Integer id, @RequestBody Producto productoDetails) {
         Producto updated = productoService.updateProducto(id, productoDetails);
@@ -138,33 +127,4 @@ public class ProductoController {
     }
 
     @GetMapping("/top/mas-caros")
-    public ResponseEntity<List<Producto>> getTop10MostExpensiveProducts() {
-        List<Producto> productos = productoService.getTop10MostExpensiveProducts();
-        return ResponseEntity.ok(productos);
-    }
-    
-    @GetMapping("/top/mas-baratos")
-    public ResponseEntity<List<Producto>> getTop10CheapestProducts() {
-        List<Producto> productos = productoService.getTop10CheapestProducts();
-        return ResponseEntity.ok(productos);
-    }
-    
-    @GetMapping("/top/mas-caros/{limit}")
-    public ResponseEntity<List<Producto>> getTopMostExpensiveProducts(@PathVariable int limit) {
-        List<Producto> productos = productoService.getTop10MostExpensiveProducts(); 
-        return ResponseEntity.ok(productos);
-    }
-    
-    @GetMapping("/buscar/stock")
-    public ResponseEntity<List<Producto>> getProductosConStock() {
-        List<Producto> productos = productoService.getProductosConStock();
-        return ResponseEntity.ok(productos);
-    }
-    
-    @GetMapping("/buscar/codigo/{codigo}")
-    public ResponseEntity<Producto> getProductoByCodigo(@PathVariable String codigo) {
-        return productoService.getProductoByCodigo(codigo)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-}
+    public ResponseEntity<List<Producto>> getTop
