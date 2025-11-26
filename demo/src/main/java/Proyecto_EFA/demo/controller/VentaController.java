@@ -55,12 +55,48 @@ public class VentaController {
     @PostMapping
     public ResponseEntity<?> createVenta(@RequestBody VentaRequest ventaRequest) {
         try {
-            System.out.println(" Recibiendo solicitud de venta: " + ventaRequest);
+            System.out.println("📦 Recibiendo solicitud de venta: " + ventaRequest);
+            
+            // 🔴 🔴 🔴 VALIDACIONES CRÍTICAS AGREGADAS 🔴 🔴 🔴
+            if (ventaRequest.getUsuarioId() == null) {
+                return ResponseEntity.badRequest().body("❌ ERROR: El ID de usuario es NULL");
+            }
+            if (ventaRequest.getEstadoId() == null) {
+                return ResponseEntity.badRequest().body("❌ ERROR: El ID de estado es NULL");
+            }
+            if (ventaRequest.getMetodoPagoId() == null) {
+                return ResponseEntity.badRequest().body("❌ ERROR: El ID de método de pago es NULL");
+            }
+            if (ventaRequest.getMetodoEnvioId() == null) {
+                return ResponseEntity.badRequest().body("❌ ERROR: El ID de método de envío es NULL");
+            }
             
             // Validar que hay items
             if (ventaRequest.getItems() == null || ventaRequest.getItems().isEmpty()) {
-                return ResponseEntity.badRequest().body(" La venta debe tener al menos un producto");
+                return ResponseEntity.badRequest().body("❌ ERROR: La venta debe tener al menos un producto");
             }
+
+            // 🔴 VALIDAR CADA ITEM INDIVIDUALMENTE
+            for (int i = 0; i < ventaRequest.getItems().size(); i++) {
+                ItemVentaRequest item = ventaRequest.getItems().get(i);
+                if (item.getProductoId() == null) {
+                    return ResponseEntity.badRequest().body("❌ ERROR: El producto en la posición " + i + " tiene ID NULL");
+                }
+                if (item.getCantidad() == null || item.getCantidad() <= 0) {
+                    return ResponseEntity.badRequest().body("❌ ERROR: La cantidad del producto en la posición " + i + " es inválida");
+                }
+                if (item.getPrecioUnitario() == null || item.getPrecioUnitario() <= 0) {
+                    return ResponseEntity.badRequest().body("❌ ERROR: El precio unitario del producto en la posición " + i + " es inválido");
+                }
+            }
+
+            // DEBUG: Mostrar los IDs que estamos recibiendo
+            System.out.println("🔍 DEBUG - IDs recibidos:");
+            System.out.println("Usuario ID: " + ventaRequest.getUsuarioId());
+            System.out.println("Estado ID: " + ventaRequest.getEstadoId());
+            System.out.println("Método Pago ID: " + ventaRequest.getMetodoPagoId());
+            System.out.println("Método Envío ID: " + ventaRequest.getMetodoEnvioId());
+            System.out.println("Número de items: " + ventaRequest.getItems().size());
 
             // Crear la venta
             Venta venta = new Venta();
@@ -71,25 +107,25 @@ public class VentaController {
             // Buscar y asignar entidades relacionadas
             Usuario usuario = usuarioService.getUsuarioById(ventaRequest.getUsuarioId());
             if (usuario == null) {
-                return ResponseEntity.badRequest().body(" Usuario no encontrado");
+                return ResponseEntity.badRequest().body("❌ ERROR: Usuario no encontrado con ID: " + ventaRequest.getUsuarioId());
             }
             venta.setUsuario(usuario);
 
             Estado estado = estadoService.getEstadoById(ventaRequest.getEstadoId());
             if (estado == null) {
-                return ResponseEntity.badRequest().body("Estado no encontrado");
+                return ResponseEntity.badRequest().body("❌ ERROR: Estado no encontrado con ID: " + ventaRequest.getEstadoId());
             }
             venta.setEstado(estado);
 
             MetodoPago metodoPago = metodoPagoService.getMetodoPagoById(ventaRequest.getMetodoPagoId());
             if (metodoPago == null) {
-                return ResponseEntity.badRequest().body("Método de pago no encontrado");
+                return ResponseEntity.badRequest().body("❌ ERROR: Método de pago no encontrado con ID: " + ventaRequest.getMetodoPagoId());
             }
             venta.setMetodoPago(metodoPago);
 
             MetodoEnvio metodoEnvio = metodoEnvioService.getMetodoEnvioById(ventaRequest.getMetodoEnvioId());
             if (metodoEnvio == null) {
-                return ResponseEntity.badRequest().body("Método de envío no encontrado");
+                return ResponseEntity.badRequest().body("❌ ERROR: Método de envío no encontrado con ID: " + ventaRequest.getMetodoEnvioId());
             }
             venta.setMetodoEnvio(metodoEnvio);
 
@@ -97,7 +133,7 @@ public class VentaController {
             for (ItemVentaRequest itemRequest : ventaRequest.getItems()) {
                 Producto producto = productoService.getProductoById(itemRequest.getProductoId());
                 if (producto == null) {
-                    return ResponseEntity.badRequest().body("Producto no encontrado: " + itemRequest.getProductoId());
+                    return ResponseEntity.badRequest().body("❌ ERROR: Producto no encontrado con ID: " + itemRequest.getProductoId());
                 }
 
                 // Crear ProductoVenta
@@ -112,7 +148,7 @@ public class VentaController {
                 venta.getItems().add(productoVenta);
             }
 
-            System.out.println("Venta creada con " + venta.getItems().size() + " productos");
+            System.out.println("✅ Venta creada con " + venta.getItems().size() + " productos");
             
             // Guardar la venta (esto activará el @PrePersist que calcula el total)
             Venta ventaCreada = ventaService.createVenta(venta);
@@ -120,9 +156,9 @@ public class VentaController {
             return ResponseEntity.status(201).body(ventaCreada);
             
         } catch (Exception e) {
-            System.err.println("Error creando venta: " + e.getMessage());
+            System.err.println("❌ ERROR CRÍTICO creando venta: " + e.getMessage());
             e.printStackTrace();
-            return ResponseEntity.internalServerError().body("Error al crear la venta: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("❌ Error al crear la venta: " + e.getMessage());
         }
     }
 
