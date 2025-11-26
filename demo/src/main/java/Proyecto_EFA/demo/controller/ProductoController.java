@@ -22,7 +22,7 @@ public class ProductoController {
     @PostMapping("/{productoId}/images")
     public ResponseEntity<?> addImageToProducto(
         @PathVariable Integer productoId,
-        @RequestPart("file") MultipartFile file     
+        @RequestPart("file") MultipartFile file      
     ) {
         try {
             Imagen nuevaImagen = productoService.addImageToProducto(productoId, file);
@@ -127,4 +127,8 @@ public class ProductoController {
     }
 
     @GetMapping("/top/mas-caros")
-    public ResponseEntity<List<Producto>> getTop
+    public ResponseEntity<List<Producto>> getTop10MostExpensiveProducts() { // METODO RESTAURADO
+        List<Producto> productos = productoService.getTop10MostExpensiveProducts();
+        return ResponseEntity.ok(productos);
+    }
+}
