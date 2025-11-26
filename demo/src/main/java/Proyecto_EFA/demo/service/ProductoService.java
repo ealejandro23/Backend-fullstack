@@ -2,7 +2,10 @@ package Proyecto_EFA.demo.service;
 
 import Proyecto_EFA.demo.model.Imagen; 
 import Proyecto_EFA.demo.model.Producto;
-import Proyecto_EFA.demo.repository.ProductoRepository; 
+import Proyecto_EFA.demo.model.Categorias;
+import Proyecto_EFA.demo.repository.ProductoRepository;
+import Proyecto_EFA.demo.repository.CategoriasRepository; 
+import Proyecto_EFA.demo.dto.ProductoCreationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,10 +21,14 @@ public class ProductoService {
     private ProductoRepository productoRepository;
     
     @Autowired
+    private CategoriasRepository categoriasRepository; 
+    
+    @Autowired
     private CloudinaryService cloudinaryService;
     
     @Autowired
     private ImagenService imagenService; 
+    
     public Imagen addImageToProducto(Integer productoId, MultipartFile file) throws IOException {
         
         Optional<Producto> optionalProducto = productoRepository.findById(productoId);
@@ -57,8 +64,28 @@ public class ProductoService {
         }).orElse(null);
     }
     
-    public Producto createProducto(Producto producto) {
-        return productoRepository.save(producto);
+    public Producto createProducto(ProductoCreationDTO productoDto) {
+        Producto nuevoProducto = new Producto();
+        
+        nuevoProducto.setNombre(productoDto.getNombre());
+        nuevoProducto.setDescripcion(productoDto.getDescripcion());
+        nuevoProducto.setPrecio(productoDto.getPrecio());
+        nuevoProducto.setImagenUrl(productoDto.getImage()); 
+        nuevoProducto.setStock(productoDto.getStock());
+        
+        if (productoDto.getCategoria() != null && !productoDto.getCategoria().isEmpty()) {
+            String categoriaNombre = productoDto.getCategoria().substring(0, 1).toUpperCase() + productoDto.getCategoria().substring(1).toLowerCase();
+            
+            Optional<Categorias> optionalCategoria = categoriasRepository.findByNombre(categoriaNombre);
+            
+            if (optionalCategoria.isPresent()) {
+                nuevoProducto.setCategorias(optionalCategoria.get()); 
+            } else {
+                System.err.println("Advertencia: Categoría no encontrada en la DB para el nombre: " + categoriaNombre);
+            }
+        }
+        
+        return productoRepository.save(nuevoProducto);
     }
     
     public Producto updateProducto(Integer id, Producto productoDetails) {
