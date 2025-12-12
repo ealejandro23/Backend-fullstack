@@ -33,7 +33,7 @@
 @SET __MVNW_PSMODULEP_SAVE=%PSModulePath%
 @SET PSModulePath=
 @FOR /F "usebackq tokens=1* delims==" %%A IN (`powershell -noprofile "& {$scriptDir='%~dp0'; $script='%__MVNW_ARG0_NAME__%'; icm -ScriptBlock ([Scriptblock]::Create((Get-Content -Raw '%~f0'))) -NoNewScope}"`) DO @(
-  IF "%%A"=="MVN_CMD" (set __MVNW_CMD__=%%B) ELSE IF "%%B"=="" (echo %%A) ELSE (echo %%A=%%B)
+  IF "%%A"=="MVN_CMD" (set __MVNW_CMD__=%%B) ELSE IF "%%B"=="" (echo %%A) ELSE (set "%%A=%%B")
 )
 @SET PSModulePath=%__MVNW_PSMODULEP_SAVE%
 @SET __MVNW_PSMODULEP_SAVE=
@@ -48,6 +48,41 @@
 $ErrorActionPreference = "Stop"
 if ($env:MVNW_VERBOSE -eq "true") {
   $VerbosePreference = "Continue"
+}
+
+# Ensure a JDK is available for this Maven run. If `javac` is not on PATH,
+# try common installation locations and set JAVA_HOME for this session.
+function Ensure-JDKForMaven {
+  if (Get-Command javac -ErrorAction SilentlyContinue) { return }
+
+  $candidates = @(
+    "$env:ProgramFiles\\Eclipse Adoptium\\jdk-17*",
+    "$env:ProgramFiles\\AdoptOpenJDK\\jdk-17*",
+    "$env:ProgramFiles\\Java\\jdk-17*",
+    "$env:ProgramFiles\\Java\\jdk*",
+    "$env:ProgramFiles\\Zulu\\zulu-17*"
+  )
+
+  foreach ($pattern in $candidates) {
+    try {
+      $dirs = Get-ChildItem -Path $pattern -Directory -ErrorAction SilentlyContinue
+    } catch {
+      $dirs = $null
+    }
+    if ($dirs -and $dirs.Count -gt 0) {
+      foreach ($d in $dirs) {
+        if (Test-Path (Join-Path $d.FullName 'bin\\javac.exe')) {
+          $env:JAVA_HOME = $d.FullName
+          $env:Path = "$env:JAVA_HOME\\bin;$env:Path"
+          Write-Verbose "Set JAVA_HOME to $env:JAVA_HOME for this session"
+          # Emit environment assignments so the calling batch wrapper can pick them up
+          Write-Output "JAVA_HOME=$env:JAVA_HOME"
+          Write-Output "PATH=$env:JAVA_HOME\\bin;$env:Path"
+          return
+        }
+      }
+    }
+  }
 }
 
 # calculate distributionUrl, requires .mvn/wrapper/maven-wrapper.properties
@@ -101,6 +136,7 @@ $MAVEN_HOME = "$MAVEN_HOME_PARENT/$MAVEN_HOME_NAME"
 
 if (Test-Path -Path "$MAVEN_HOME" -PathType Container) {
   Write-Verbose "found existing MAVEN_HOME at $MAVEN_HOME"
+  Ensure-JDKForMaven
   Write-Output "MVN_CMD=$MAVEN_HOME/bin/$MVN_CMD"
   exit $?
 }
@@ -186,4 +222,5 @@ try {
   catch { Write-Warning "Cannot remove $TMP_DOWNLOAD_DIR" }
 }
 
+Ensure-JDKForMaven
 Write-Output "MVN_CMD=$MAVEN_HOME/bin/$MVN_CMD"
