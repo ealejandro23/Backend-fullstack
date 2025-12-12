@@ -20,6 +20,11 @@ public class CloudinaryService {
         this.cloudinary = cloudinary;
     }
 
+    // No-arg constructor for tests and frameworks that instantiate without providing a Cloudinary bean
+    public CloudinaryService() {
+        this.cloudinary = null;
+    }
+
     public Map<String, Object> uploadImage(MultipartFile file) {
         if (cloudinary != null) {
             try {
