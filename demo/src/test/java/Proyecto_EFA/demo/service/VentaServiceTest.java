@@ -50,3 +50,4 @@ class VentaServiceTest {
         assertEquals("NV-1", res.getNumeroVenta());
     }
 }
+//estoy cansado jefe
