@@ -92,4 +92,4 @@ public class VentaService {
         return ventaRepository.findByUsuarioIdAndEstadoId(usuarioId, estadoId);
     }
 }
-//.\mvnw.cmd test wadwadas
+//.\mvnw.cmd test
