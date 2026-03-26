@@ -11,6 +11,10 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
 EXPOSE 8080
+<<<<<<< HEAD
 ENTRYPOINT ["java", "-Dserver.port=${PORT:8080}", "-jar", "app.jar"]
 
 #aDSAda
+=======
+ENTRYPOINT ["java", "-Dserver.port=${PORT:8080}", "-jar", "app.jar"]
+>>>>>>> cb14a6340077c471828c21a65bf79f9fb7d7b543
