@@ -1,0 +1,71 @@
+package Proyecto_EFA.demo.model;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Venta {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(unique = true, nullable = false)
+    private String numeroVenta;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnoreProperties({"ventas", "hibernateLazyInitializer", "handler"})
+    private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "estado_id")
+    @JsonIgnoreProperties("ventas")
+    private Estado estado;
+
+    @ManyToOne
+    @JoinColumn(name = "metodo_pago_id")
+    @JsonIgnoreProperties("ventas")
+    private MetodoPago metodoPago;
+
+    @ManyToOne
+    @JoinColumn(name = "metodo_envio_id")
+    @JsonIgnoreProperties("ventas")
+    private MetodoEnvio metodoEnvio;
+
+    @Column(nullable = true) 
+    private Double total;
+
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<ProductoVenta> items = new ArrayList<>();
+
+    @PrePersist
+    @PreUpdate
+    public void calcularTotal() {
+        this.total = items.stream()
+                .mapToDouble(item -> item.getSubtotal() != null ? item.getSubtotal() : 0)
+                .sum();
+    }
+}
