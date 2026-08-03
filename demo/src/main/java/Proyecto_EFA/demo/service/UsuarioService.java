@@ -138,18 +138,10 @@ public class UsuarioService {
     }
     
     public int countByRol(Integer rolId) {
-<<<<<<< HEAD
-        return 
-        usuarioRepository.countByRol(rolId);
-    }
-
-    public Usuario getUsuarioById(Integer id) {
-    return usuarioRepository.findById(id).orElse(null);
-}
-
-=======
         return usuarioRepository.countByRol(rolId);
     }
 
->>>>>>> 0b8e625ef1bea8dfa064b2dc73c28c7f4393f2b9
+    public Usuario getUsuarioById(Integer id) {
+        return usuarioRepository.findById(id).orElse(null);
+    }
 }
