@@ -6,8 +6,6 @@ import org.springframework.stereotype.Component;
 import Proyecto_EFA.demo.model.*;
 import Proyecto_EFA.demo.repository.*;
 
-import java.util.Optional;
-
 @Component
 public class DataLoader implements CommandLineRunner {
 
@@ -31,45 +29,59 @@ public class DataLoader implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (categoriasRepository.count() == 0) {
-            crearDatosBasicos();
-        }
-
-        if (productoRepository.count() == 0) {
-            crearProductos();
-            System.out.println(" Datos iniciales cargados: 20 productos con imágenes creados");
-        }
+                crearDatosBasicos();
+                crearProductos();
     }
 
     private void crearDatosBasicos() {
-        Categorias hombre = new Categorias();
-        hombre.setNombre("hombre");
-        categoriasRepository.save(hombre);
-
-        Categorias mujer = new Categorias();
-        mujer.setNombre("mujer");
-        categoriasRepository.save(mujer);
-
-        Categorias infantil = new Categorias();
-        infantil.setNombre("infantil");
-        categoriasRepository.save(infantil);
-
-        Marca marcaDefault = new Marca();
-        marcaDefault.setNombre("EFA");
-        marcaRepository.save(marcaDefault);
-
-        Tallas tallaDefault = new Tallas();
-        tallaDefault.setNombre("Única");
-        tallasRepository.save(tallaDefault);
-
-        Colores colorDefault = new Colores();
-        colorDefault.setNombre("Variado");
-        coloresRepository.save(colorDefault);
-
-        Materiales materialDefault = new Materiales();
-        materialDefault.setNombre("Algodón");
-        materialesRepository.save(materialDefault);
+                crearCategoria("hombre");
+                crearCategoria("mujer");
+                crearCategoria("infantil");
+                crearMarca("EFA");
+                crearTalla("Única");
+                crearColor("Variado");
+                crearMaterial("Algodón");
     }
+
+        private Categorias crearCategoria(String nombre) {
+                return categoriasRepository.findByNombre(nombre).orElseGet(() -> {
+                        Categorias categoria = new Categorias();
+                        categoria.setNombre(nombre);
+                        return categoriasRepository.save(categoria);
+                });
+        }
+
+        private Marca crearMarca(String nombre) {
+                return marcaRepository.findByNombre(nombre).orElseGet(() -> {
+                        Marca marca = new Marca();
+                        marca.setNombre(nombre);
+                        return marcaRepository.save(marca);
+                });
+        }
+
+        private Tallas crearTalla(String nombre) {
+                return tallasRepository.findByNombre(nombre).orElseGet(() -> {
+                        Tallas talla = new Tallas();
+                        talla.setNombre(nombre);
+                        return tallasRepository.save(talla);
+                });
+        }
+
+        private Colores crearColor(String nombre) {
+                return coloresRepository.findByNombre(nombre).orElseGet(() -> {
+                        Colores color = new Colores();
+                        color.setNombre(nombre);
+                        return coloresRepository.save(color);
+                });
+        }
+
+        private Materiales crearMaterial(String nombre) {
+                return materialesRepository.findByNombre(nombre).orElseGet(() -> {
+                        Materiales material = new Materiales();
+                        material.setNombre(nombre);
+                        return materialesRepository.save(material);
+                });
+        }
 
     private void crearProductos() {
         Categorias hombre = categoriasRepository.findByNombre("hombre")
@@ -82,13 +94,13 @@ public class DataLoader implements CommandLineRunner {
         Marca marca = marcaRepository.findByNombre("EFA")
                 .orElseThrow(() -> new RuntimeException("Marca EFA no encontrada"));
         
-        Tallas talla = tallasRepository.findById(1)
+        Tallas talla = tallasRepository.findByNombre("Única")
                 .orElseThrow(() -> new RuntimeException("Talla no encontrada"));
         
         Colores color = coloresRepository.findByNombre("Variado")
                 .orElseThrow(() -> new RuntimeException("Color no encontrada"));
         
-        Materiales material = materialesRepository.findById(1)
+        Materiales material = materialesRepository.findByNombre("Algodón")
                 .orElseThrow(() -> new RuntimeException("Material no encontrado"));
 
         // --- Ropa Hombre ---
@@ -134,6 +146,8 @@ public class DataLoader implements CommandLineRunner {
         producto.setMateriales(material);
         producto.setImagenUrl(imagenUrl);
         
-        productoRepository.save(producto);
+                if (productoRepository.findByCodigo(codigo).isEmpty()) {
+                        productoRepository.save(producto);
+                }
     }
 }

@@ -11,9 +11,11 @@ import java.util.Map;
 @Service
 public class CloudinaryService {
 
-    @Autowired
+    @Autowired(required = false)
     private Cloudinary cloudinary;
+
     public Map<?, ?> uploadImage(MultipartFile file) throws IOException {
+        requireCloudinary();
         // La carpeta 'efa_productos' se usa para organizar las imágenes en Cloudinary.
         Map<?, ?> uploadResult = cloudinary.uploader().upload(
             file.getBytes(), 
@@ -22,7 +24,13 @@ public class CloudinaryService {
         return uploadResult;
     }
     public void deleteImage(String publicId) throws IOException {
-      
+        requireCloudinary();
         cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+    }
+
+    private void requireCloudinary() {
+        if (cloudinary == null) {
+            throw new IllegalStateException("Cloudinary no está configurado. Define CLOUDINARY_URL para subir imágenes.");
+        }
     }
 }
