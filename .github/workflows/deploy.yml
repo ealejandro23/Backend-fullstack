@@ -1,0 +1,106 @@
+name: Build, push y deploy backend (AWS EC2 + ECR)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "demo/**"
+      - "Dockerfile"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1                     # cámbialo por tu región de AWS Academy
+  ECR_REPOSITORY: proyecto-efa-backend       # nombre del repo en ECR
+  CONTAINER_NAME: proyecto-efa-backend
+
+jobs:
+  # -----------------------------------------------------------------
+  # JOB 1: Build de la imagen y push a ECR
+  # Corre en un runner de GitHub (rápido, no consume la EC2 del Academy)
+  # -----------------------------------------------------------------
+  build-and-push:
+    name: Build & push a ECR
+    runs-on: ubuntu-latest
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tag }}
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar credenciales AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # AWS Academy entrega credenciales TEMPORALES (expiran ~4h por sesión de lab).
+          # Hay que actualizar este secret cada vez que reinicies el lab.
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login en Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Definir tag de imagen
+        id: meta
+        run: echo "tag=${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
+
+      - name: Build y push de la imagen Docker
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ steps.meta.outputs.tag }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+  # -----------------------------------------------------------------
+  # JOB 2: Deploy en la instancia EC2
+  # Corre EN la propia EC2 (runner self-hosted registrado ahí),
+  # así no necesitamos abrir el puerto 22 desde GitHub hacia la instancia.
+  # -----------------------------------------------------------------
+  deploy:
+    name: Deploy en EC2
+    needs: build-and-push
+    runs-on: self-hosted   # runner instalado en la instancia EC2 de AWS Academy
+    steps:
+      - name: Configurar credenciales AWS (para el pull de ECR)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login en Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Checkout código (para el docker-compose.yml)
+        uses: actions/checkout@v4
+
+      - name: Generar .env para docker compose
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ needs.build-and-push.outputs.image-tag }}
+        run: |
+          cat > .env <<EOF
+          ECR_REGISTRY=$ECR_REGISTRY
+          ECR_REPOSITORY=$ECR_REPOSITORY
+          IMAGE_TAG=$IMAGE_TAG
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          CLOUDINARY_URL=${{ secrets.CLOUDINARY_URL }}
+          EOF
+
+      - name: Pull de la nueva imagen
+        run: docker compose --env-file .env pull backend
+
+      - name: Levantar backend + base de datos
+        run: docker compose --env-file .env up -d
+
+      - name: Limpiar imágenes viejas
+        run: docker image prune -af --filter "until=48h"

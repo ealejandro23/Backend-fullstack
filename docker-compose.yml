@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: proyecto-efa-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-efa}
+      POSTGRES_USER: ${POSTGRES_USER:-efa_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - efa_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"          # coméntalo si no necesitas acceder a la DB desde fuera de la EC2
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-efa_user} -d ${POSTGRES_DB:-efa}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG:-latest}
+    container_name: proyecto-efa-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-efa}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-efa_user}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CLOUDINARY_URL: ${CLOUDINARY_URL}
+      PORT: 8080
+    ports:
+      - "8080:8080"
+
+volumes:
+  efa_pgdata:
