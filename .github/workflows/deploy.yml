@@ -16,8 +16,6 @@ env:
 
 jobs:
   # JOB 1: Build de la imagen y push a ECR
-  # Corre en un runner de GitHub (rápido, no consume la EC2 del Academy)
-
   build-and-push:
     name: Build & push a ECR
     runs-on: ubuntu-latest
@@ -54,8 +52,6 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
   # JOB 2: Deploy en la instancia EC2
-  # Corre EN la propia EC2 (runner self-hosted registrado ahí),
-  # así no necesitamos abrir el puerto 22 desde GitHub hacia la instancia.
   deploy:
     name: Deploy en EC2
     needs: build-and-push
