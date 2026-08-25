@@ -10,15 +10,14 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_REGION: us-east-1                     # cámbialo por tu región de AWS Academy
-  ECR_REPOSITORY: proyecto-efa-backend       # nombre del repo en ECR
+  AWS_REGION: us-east-1                     
+  ECR_REPOSITORY: proyecto-efa-backend       
   CONTAINER_NAME: proyecto-efa-backend
 
 jobs:
-  # -----------------------------------------------------------------
   # JOB 1: Build de la imagen y push a ECR
   # Corre en un runner de GitHub (rápido, no consume la EC2 del Academy)
-  # -----------------------------------------------------------------
+
   build-and-push:
     name: Build & push a ECR
     runs-on: ubuntu-latest
@@ -33,8 +32,6 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          # AWS Academy entrega credenciales TEMPORALES (expiran ~4h por sesión de lab).
-          # Hay que actualizar este secret cada vez que reinicies el lab.
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: ${{ env.AWS_REGION }}
 
@@ -56,15 +53,13 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-  # -----------------------------------------------------------------
   # JOB 2: Deploy en la instancia EC2
   # Corre EN la propia EC2 (runner self-hosted registrado ahí),
   # así no necesitamos abrir el puerto 22 desde GitHub hacia la instancia.
-  # -----------------------------------------------------------------
   deploy:
     name: Deploy en EC2
     needs: build-and-push
-    runs-on: self-hosted   # runner instalado en la instancia EC2 de AWS Academy
+    runs-on: self-hosted 
     steps:
       - name: Configurar credenciales AWS (para el pull de ECR)
         uses: aws-actions/configure-aws-credentials@v4
