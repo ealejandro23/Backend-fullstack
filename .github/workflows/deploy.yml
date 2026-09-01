@@ -16,44 +16,14 @@ env:
 
 jobs:
 
-  build:
-    name: Build de la imagen Docker
+  build-and-push:
+    name: Build & push a ECR
     runs-on: ubuntu-latest
     outputs:
       image-tag: ${{ steps.meta.outputs.tag }}
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
-
-      - name: Definir tag de imagen
-        id: meta
-        run: echo "tag=${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
-
-      - name: Build de la imagen Docker
-        run: docker build -t ${{ env.ECR_REPOSITORY }}:${{ steps.meta.outputs.tag }} .
-
-      - name: Guardar imagen como artifact
-        run: docker save ${{ env.ECR_REPOSITORY }}:${{ steps.meta.outputs.tag }} -o image.tar
-
-      - name: Subir artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: docker-image
-          path: image.tar
-          retention-days: 1
-
-  push:
-    name: Push a ECR
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Descargar artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: docker-image
-
-      - name: Cargar imagen Docker
-        run: docker load -i image.tar
 
       - name: Configurar credenciales AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -67,19 +37,23 @@ jobs:
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Tag y push de la imagen
+      - name: Definir tag de imagen
+        id: meta
+        run: echo "tag=${GITHUB_SHA::8}" >> "$GITHUB_OUTPUT"
+
+      - name: Build y push de la imagen Docker
         env:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
-        run: |
-          docker tag ${{ env.ECR_REPOSITORY }}:$IMAGE_TAG $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
-          docker tag ${{ env.ECR_REPOSITORY }}:$IMAGE_TAG $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
-          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
-          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
+          IMAGE_TAG: ${{ steps.meta.outputs.tag }}
+        run:
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
   deploy:
     name: Deploy en EC2
-    needs: [build, push]
+    needs: build-and-push
     runs-on: self-hosted
     steps:
       - name: Configurar credenciales AWS (para el pull de ECR)
@@ -100,7 +74,7 @@ jobs:
       - name: Generar .env para docker compose
         env:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-          IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
+          IMAGE_TAG: ${{ needs.build-and-push.outputs.image-tag }}
         run: |
           cat > .env <<EOF
           ECR_REGISTRY=$ECR_REGISTRY
