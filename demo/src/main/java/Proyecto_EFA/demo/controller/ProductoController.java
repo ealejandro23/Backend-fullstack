@@ -103,6 +103,12 @@ public class ProductoController {
         List<Producto> productos = productoService.searchProductosByNombre(nombre);
         return ResponseEntity.ok(productos);
     }
+
+    @GetMapping("/buscar/nombre-contiene")
+    public ResponseEntity<List<Producto>> searchProductosByNombreContiene(@RequestParam String nombre) {
+        List<Producto> productos = productoService.searchByNombreContaining(nombre);
+        return ResponseEntity.ok(productos);
+    }
     
     @GetMapping("/buscar/marca/{marcaId}/categoria/{categoriaId}")
     public ResponseEntity<List<Producto>> getProductosByMarcaAndCategoria(@PathVariable Integer marcaId, @PathVariable Integer categoriaId) {
