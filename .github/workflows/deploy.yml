@@ -56,6 +56,7 @@ jobs:
         run: docker load -i image.tar
 
       - name: Configurar credenciales AWS
+        if: ${{ vars.DEMO_MODE != 'true' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -64,10 +65,12 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login en Amazon ECR
+        if: ${{ vars.DEMO_MODE != 'true' }}
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Tag y push de la imagen
+        if: ${{ vars.DEMO_MODE != 'true' }}
         env:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
           IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
@@ -77,12 +80,19 @@ jobs:
           docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
           docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
 
+      - name: Simular push (demo mode)
+        if: ${{ vars.DEMO_MODE == 'true' }}
+        run: |
+          echo "🟡 DEMO_MODE activo: se omite push real a ECR"
+          echo "Imagen que se hubiera pusheado: ${{ env.ECR_REPOSITORY }}:${{ needs.build.outputs.image-tag }}"
+
   deploy:
     name: Deploy en EC2
     needs: [build, push]
     runs-on: self-hosted
     steps:
       - name: Configurar credenciales AWS (para el pull de ECR)
+        if: ${{ vars.DEMO_MODE != 'true' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -91,6 +101,7 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login en Amazon ECR
+        if: ${{ vars.DEMO_MODE != 'true' }}
         id: ecr-login
         uses: aws-actions/amazon-ecr-login@v2
 
@@ -98,6 +109,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generar .env para docker compose
+        if: ${{ vars.DEMO_MODE != 'true' }}
         env:
           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
           IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
@@ -113,10 +125,17 @@ jobs:
           EOF
 
       - name: Pull de la nueva imagen
+        if: ${{ vars.DEMO_MODE != 'true' }}
         run: docker compose --env-file .env pull backend
 
       - name: Levantar backend + base de datos
+        if: ${{ vars.DEMO_MODE != 'true' }}
         run: docker compose --env-file .env up -d
 
       - name: Limpiar imágenes viejas
+        if: ${{ vars.DEMO_MODE != 'true' }}
         run: docker image prune -af --filter "until=48h"
+
+      - name: Simular deploy (demo mode)
+        if: ${{ vars.DEMO_MODE == 'true' }}
+        run: echo "DEMO_MODE activo: se omite deploy real en EC2"
