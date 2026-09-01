@@ -91,12 +91,18 @@ docker run -p 8080:8080 proyecto-efa-backend
 
 ## CI/CD
 
-El workflow `.github/workflows/deploy.yml` automatiza:
+El workflow `.github/workflows/ci.yml` automatiza la integración continua:
+
+1. **Build & pruebas**: compila el proyecto (Maven) y ejecuta las pruebas automáticas para validar la calidad del código.
+
+Se dispara en cada **push a `develop`** y en cada **pull request hacia `main`**.
+
+Además, el workflow `.github/workflows/deploy.yml` permite el despliegue manual:
 
 1. **Build & push**: compila la imagen Docker y la publica en **Amazon ECR**.
 2. **Deploy**: en un runner self-hosted en **EC2**, hace *pull* de la nueva imagen y levanta el stack (`backend` + `db`) con Docker Compose, limpiando imágenes antiguas.
 
-Se dispara en cada `push` a `main` que modifique `demo/**`, `Dockerfile` o el propio workflow (también manualmente vía `workflow_dispatch`).
+Se ejecuta manualmente vía `workflow_dispatch` (botón "Run workflow"), y requiere las credenciales AWS configuradas como secretos en el repositorio.
 
 ## Documentación adicional
 
@@ -169,7 +175,7 @@ Tipos usados: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
 ## Pipeline CI/CD (GitHub Actions)
 
 - **`ci.yml`**: se ejecuta en cada `push` a `develop` y en cada `pull_request` hacia `main`. Realiza el *build* y las pruebas automáticas para validar la integración.
-- **`deploy.yml`**: se ejecuta en cada `push` a `main` (vía `push` directo o tras aprobar el release) y despliega la imagen Docker hacia **Amazon ECR** y **EC2** (runner self-hosted), levantando el stack `backend` + `db` con Docker Compose.
+- **`deploy.yml`**: despliegue manual hacia **Amazon ECR** y **EC2** (runner self-hosted) vía `workflow_dispatch` (requiere credenciales AWS en los secretos del repositorio).
 
 Los detalles de build, push y despliegue se encuentran en las secciones anteriores de este documento.
 
