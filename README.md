@@ -101,3 +101,78 @@ Se dispara en cada `push` a `main` que modifique `demo/**`, `Dockerfile` o el pr
 ## Documentación adicional
 
 El archivo `MODELS.md` contiene el detalle del modelo de datos del proyecto.
+
+---
+
+# Control de versiones y flujo de trabajo DevOps
+
+Este proyecto se gestiona siguiendo una estrategia de ramificación **GitFlow**, con el fin de asegurar la trazabilidad del código, la colaboración entre integrantes y la estabilidad de la rama de producción.
+
+## Estrategia de ramificación: GitFlow
+
+Elegimos **GitFlow** por sobre *trunk-based development* por las siguientes razones:
+
+- El encargo exige explícitamente las ramas `main`, `develop`, `feature/*` y `hotfix/*`, que es el modelo natural de GitFlow.
+- El proyecto se desarrolla en parejas y se integrará con lanzamientos de versiones planificados (releases) a lo largo del semestre, ideal para un producto tipo e-commerce.
+- Las ramas de larga duración (`main` y `develop`) separan claramente lo estable de lo que está en desarrollo.
+- Las ramas efímeras (`feature/*` y `hotfix/*`) aíslan el trabajo y permiten la revisión mediante Pull Requests antes de integrar.
+- La rama `hotfix/*` permite corregir problemas en producción sin esperar al siguiente release.
+
+### Estructura de ramas
+
+| Rama | Descripción |
+|---|---|
+| `main` | Rama de producción. Siempre estable. Solo recibe merges desde `develop` y `hotfix/*`. |
+| `develop` | Rama de integración. Centraliza los features desarrollados. |
+| `feature/<nombre>` | Nueva funcionalidad. Nace de `develop` y se integra vía Pull Request. |
+| `hotfix/<nombre>` | Corrección de emergencia. Nace de `main` y se mezcla a `main` y de vuelta a `develop`. |
+
+## Convenciones de nombrado de ramas
+
+- Se usan minúsculas y guiones (`-`) como separadores: `feature/mejora-catalogo`, `hotfix/correccion-ventas`.
+- Las `feature/*` deben salir desde `develop` y referirse a una funcionalidad concreta, en inglés o español según el caso.
+
+## Convención de mensajes de commit
+
+Seguimos una convención basada en **Conventional Commits**:
+
+```
+<tipo>(<ámbito>): <descripción>
+```
+
+Ejemplos:
+
+- `feat(catalogo): agregar filtro por talla`
+- `fix(ventas): corregir cálculo de totales`
+- `docs(readme): documentar convenciones de ramas`
+- `style(usuario): ordenar imports`
+- `refactor(pago): simplificar lógica del checkout`
+- `test(venta): agregar pruebas del servicio`
+- `chore(deps): actualizar dependencias`
+
+Tipos usados: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
+
+## Estrategia de merges
+
+- Los cambios de funcionalidad se integran a `develop` mediante **Pull Requests**.
+- Se utilizan merge de `--no-ff` (con commit de merge) para conservar la trazabilidad del historial.
+- Una vez `develop` está estable, se fusiona a `main` (release).
+- Las correcciones `hotfix/*` se fusionan a `main` y se propagan también a `develop`.
+
+## Estrategia de revisión (Code Review)
+
+- Toda integración a `develop` y a `main` requiere **al menos una aprobación** de un integrante del equipo.
+- Antes de aprobar se verifica el resultado del pipeline de CI (GitHub Actions) y el *diff* de la Pull Request.
+- Las discusiones y resoluciones de conflictos se realizan dentro de los comentarios del Pull Request.
+- Se evita el *push* directo a `main` y `develop`; los cambios entran exclusivamente por Pull Request.
+
+## Pipeline CI/CD (GitHub Actions)
+
+- **`ci.yml`**: se ejecuta en cada `push` a `develop` y en cada `pull_request` hacia `main`. Realiza el *build* y las pruebas automáticas para validar la integración.
+- **`deploy.yml`**: se ejecuta en cada `push` a `main` (vía `push` directo o tras aprobar el release) y despliega la imagen Docker hacia **Amazon ECR** y **EC2** (runner self-hosted), levantando el stack `backend` + `db` con Docker Compose.
+
+Los detalles de build, push y despliegue se encuentran en las secciones anteriores de este documento.
+
+## Uso de herramientas de IA
+
+En este proyecto se utilizó IA como apoyo para mejorar la redacción de esta documentación y generar diagramas de apoyo. Todo el contenido técnico generado fue revisado y validado por el equipo. Las reflexiones y justificaciones técnicas son de autoría propia de los integrantes.
