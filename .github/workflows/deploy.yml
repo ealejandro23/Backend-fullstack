@@ -59,4 +59,84 @@ jobs:
         if: ${{ vars.DEMO_MODE != 'true' }}
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login en Amazon ECR
+        if: ${{ vars.DEMO_MODE != 'true' }}
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Tag y push de la imagen
+        if: ${{ vars.DEMO_MODE != 'true' }}
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
+        run: |
+          docker tag ${{ env.ECR_REPOSITORY }}:$IMAGE_TAG $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          docker tag ${{ env.ECR_REPOSITORY }}:$IMAGE_TAG $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
+          docker push $ECR_REGISTRY/${{ env.ECR_REPOSITORY }}:latest
+
+      - name: Simular push (demo mode)
+        if: ${{ vars.DEMO_MODE == 'true' }}
+        run: |
+          echo "DEMO_MODE activo: se omite push real a ECR"
+          echo "Imagen que se hubiera pusheado: ${{ env.ECR_REPOSITORY }}:${{ needs.build.outputs.image-tag }}"
+
+  deploy:
+    name: Deploy en EC2
+    needs: [build, push]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configurar credenciales AWS (para el pull de ECR)
+        if: ${{ vars.DEMO_MODE != 'true' }}
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login en Amazon ECR
+        if: ${{ vars.DEMO_MODE != 'true' }}
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Checkout código (para el docker-compose.yml)
+        uses: actions/checkout@v4
+
+      - name: Generar .env para docker compose
+        if: ${{ vars.DEMO_MODE != 'true' }}
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ needs.build.outputs.image-tag }}
+        run: |
+          cat > .env <<EOF
+          ECR_REGISTRY=$ECR_REGISTRY
+          ECR_REPOSITORY=$ECR_REPOSITORY
+          IMAGE_TAG=$IMAGE_TAG
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          CLOUDINARY_URL=${{ secrets.CLOUDINARY_URL }}
+          EOF
+
+      - name: Pull de la nueva imagen
+        if: ${{ vars.DEMO_MODE != 'true' }}
+        run: docker compose --env-file .env pull backend
+
+      - name: Levantar backend + base de datos
+        if: ${{ vars.DEMO_MODE != 'true' }}
+        run: docker compose --env-file .env up -d
+
+      - name: Limpiar imágenes viejas
+        if: ${{ vars.DEMO_MODE != 'true' }}
+        run: docker image prune -af --filter "until=48h"
+
+      - name: Simular deploy (demo mode)
+        if: ${{ vars.DEMO_MODE == 'true' }}
+        run: |
+          echo "DEMO_MODE activo: se omite deploy real en EC2"
