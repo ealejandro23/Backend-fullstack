@@ -89,6 +89,10 @@ public class VentaController {
             venta.setMetodoEnvio(metodoEnvio);
 
             for (ItemVentaRequest itemRequest : ventaRequest.getItems()) {
+                if (itemRequest.getCantidad() == null || itemRequest.getCantidad() <= 0) {
+                    return ResponseEntity.badRequest().body("La cantidad de cada producto debe ser mayor a 0");
+                }
+
                 Producto producto = productoService.getProductoById(itemRequest.getProductoId());
                 if (producto == null) {
                     return ResponseEntity.badRequest().body("Producto no encontrado: " + itemRequest.getProductoId());
