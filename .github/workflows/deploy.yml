@@ -1,14 +1,8 @@
 name: Build, push y deploy backend (AWS EC2 + ECR)
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "demo/**"
-      - "Dockerfile"
-      - ".github/workflows/deploy.yml"
   workflow_dispatch:
-####
+
 env:
   AWS_REGION: us-east-1                     
   ECR_REPOSITORY: proyecto-efa-backend       
