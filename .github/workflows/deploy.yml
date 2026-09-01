@@ -83,13 +83,13 @@ jobs:
       - name: Simular push (demo mode)
         if: ${{ vars.DEMO_MODE == 'true' }}
         run: |
-          echo "🟡 DEMO_MODE activo: se omite push real a ECR"
+          echo "DEMO_MODE activo: se omite push real a ECR"
           echo "Imagen que se hubiera pusheado: ${{ env.ECR_REPOSITORY }}:${{ needs.build.outputs.image-tag }}"
 
   deploy:
     name: Deploy en EC2
     needs: [build, push]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Configurar credenciales AWS (para el pull de ECR)
         if: ${{ vars.DEMO_MODE != 'true' }}
@@ -138,4 +138,5 @@ jobs:
 
       - name: Simular deploy (demo mode)
         if: ${{ vars.DEMO_MODE == 'true' }}
-        run: echo "DEMO_MODE activo: se omite deploy real en EC2"
+        run: |
+          echo "DEMO_MODE activo: se omite deploy real en EC2"
