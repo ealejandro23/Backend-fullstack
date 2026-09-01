@@ -1,15 +1,21 @@
 name: Build, push y deploy backend (AWS EC2 + ECR)
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "demo/**"
+      - "Dockerfile"
+      - ".github/workflows/deploy.yml"
   workflow_dispatch:
 
 env:
-  AWS_REGION: us-east-1                     
-  ECR_REPOSITORY: proyecto-efa-backend       
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: proyecto-efa-backend
   CONTAINER_NAME: proyecto-efa-backend
 
 jobs:
-  # JOB 1: Build de la imagen y push a ECR
+
   build-and-push:
     name: Build & push a ECR
     runs-on: ubuntu-latest
@@ -45,11 +51,10 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-  # JOB 2: Deploy en la instancia EC2
   deploy:
     name: Deploy en EC2
     needs: build-and-push
-    runs-on: self-hosted 
+    runs-on: self-hosted
     steps:
       - name: Configurar credenciales AWS (para el pull de ECR)
         uses: aws-actions/configure-aws-credentials@v4
@@ -87,5 +92,10 @@ jobs:
       - name: Levantar backend + base de datos
         run: docker compose --env-file .env up -d
 
-      - name: Limpiar imágenes viejas
+  cleanup:
+    name: Limpiar imágenes viejas
+    needs: [build-and-push, deploy]
+    runs-on: self-hosted
+    steps:
+      - name: Limpiar imágenes Docker antiguas
         run: docker image prune -af --filter "until=48h"
