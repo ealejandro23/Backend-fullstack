@@ -1,0 +1,35 @@
+name: CI - Build y pruebas
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Compilar y probar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Compilar el proyecto
+        working-directory: demo
+        run: mvn -B -ntp compile
+
+      - name: Ejecutar pruebas
+        working-directory: demo
+        run: mvn -B -ntp test
+
+      - name: Empaquetar (skip tests, ya ejecutadas)
+        working-directory: demo
+        run: mvn -B -ntp package -DskipTests

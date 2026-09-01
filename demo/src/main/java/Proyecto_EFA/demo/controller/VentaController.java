@@ -209,4 +209,9 @@ public class VentaController {
         int count = ventaService.countVentasByUsuario(usuarioId);
         return ResponseEntity.ok(count);
     }
+
+    @GetMapping("/totales")
+    public ResponseEntity<Integer> countTotalVentas() {
+        return ResponseEntity.ok(ventaService.getAllVentas().size());
+    }
 }
